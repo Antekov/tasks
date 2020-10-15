@@ -42,9 +42,12 @@ vector<size_t> search_z(string p, string t, int start = 0) {
     
     vector<int> z(k);
 	for (int i=1, l=0, r=0; i<k; ++i) {
-		if (i <= r)
+		if (i <= r) {
 			z[i] = min(r-i+1, z[i-l]);
-		while (i+z[i] < k && s[z[i]] == s[i+z[i]])
+        } else {
+            z[i] = 0;
+        }
+		while (i+z[i] < k && s[z[i]] == s[i+z[i]]) 
 			++z[i];
 		if (i+z[i]-1 > r)
 			l = i,  r = i+z[i]-1;
@@ -69,12 +72,20 @@ vector<size_t> search_z1(string p, string t, int start = 0) {
     
     vector<int> z(k);
 	for (int i=1, l=0, r=0; i<k; ++i) {
-		if (i <= r)
+        std::cout << "pos | left | right = " << i << " | " << l << " | " << r << std::endl; 
+		if (i <= r) {
 			z[i] = min(r-i+1, z[i-l]);
-		while (i+z[i] < k && s[z[i]] == s[i+z[i]] && z[i] < m)
+        } else {
+            z[i] = 0;
+        }
+		while (i+z[i] < k && s[z[i]] == s[i+z[i]] && z[i] < m) {
 			++z[i];
-		if (i+z[i]-1 > r)
-			l = i,  r = i+z[i]-1;
+        }
+        std::cout << "z[" << i << "]=" << z[i] << std::endl;
+		if (i+z[i]-1 > r) {
+			l = i;
+            r = i+z[i]-1;
+        }
         if (i >= m && z[i] == m) {
             entries.push_back(i - m);
         }
@@ -85,22 +96,10 @@ vector<size_t> search_z1(string p, string t, int start = 0) {
 
 int main() {
     string p, t;
+    freopen("input.txt", "r", stdin);
     cin >> p >> t;
-    /*
-    char ch;
-
-    while (cin >> ch) {
-        t += ch;
-    }
-
-    cout << t << endl;
-    */
+ 
     vector<size_t> entries = search_z(p, t);
-    
-    for (auto i : entries) {
-        cout << i << ' ';
-    }
-    cout << endl;
     
     entries = search_z1(p, t);
     
