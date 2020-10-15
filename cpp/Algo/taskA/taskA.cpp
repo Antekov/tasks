@@ -14,10 +14,11 @@ class Solution {
         count++;
     }
 
-    char get(size_t pos) {
+    char get(size_t shift) {
         char ch;
 
-        ch = str[pos - m];
+        ch = str[pos + shift - m ];
+        std::cout << shift << std::endl;
 
         return ch;
     }
@@ -61,20 +62,15 @@ public:
                         //break;
                     }
                     if (std::cin >> ch) {
-                        
                         add(ch);
-                        
-                        
                     } 
-                        
-                    
-                    std::cout << "t[" << pos + z_value << "]=" << ch << std::endl;
-                        if (pattern[z_value] == str[pos + z_value - m] && z_value < m) {
-                            z_value++;
-                        } else {
-                            break;
-                        }
 
+                    std::cout << "t[" << pos + z_value << "]=" << ch << std::endl;
+                    if (pattern[z_value] == get(z_value) && z_value < m) {
+                        z_value++;
+                    } else {
+                        break;
+                    }
                 }  
             }
             std::cout << "z[" << pos << "]=" << z_value << std::endl;
