@@ -3,28 +3,44 @@
 #include <vector>
 
 class Solution {
-    std::string pattern;
+    std::string pattern, str;
     std::vector<size_t> entries;
     std::vector<size_t> z;
     size_t left, right, pos;
-    size_t m;
+    size_t m, count;
+
+    void add(char ch) {
+        str += ch;
+        count++;
+    }
+
+    char get(size_t pos) {
+        char ch;
+
+        ch = str[pos - m];
+
+        return ch;
+    }
+
+    bool isComplete() {
+        return (pos - m == count);
+    }
 
     
 public:
-    Solution(std::string &pattern) : pattern(pattern), m(pattern.length()) {}
+    Solution(std::string &pattern) : pattern(pattern), m(pattern.length()), count(0) {
+        str = "";
+    }
 
     void solve() {
         char ch;
         z.resize(m);
         z[0] = 0;
-        size_t tpos = 0;
         pos = 1, left = 0, right = 0;
         size_t z_value = 0;
-        bool isComplete = false;
-        std::string str;
-        size_t count = 0;
+        
 
-        while (!isComplete) {
+        while (!isComplete()) {
             std::cout << "pos | left | right = " << pos << " | " << left << " | " << right << std::endl;
             
             if (pos <= right) {
@@ -46,8 +62,7 @@ public:
                     }
                     if (std::cin >> ch) {
                         
-                        str += ch;
-                        count++;
+                        add(ch);
                         
                         
                     } 
@@ -57,7 +72,6 @@ public:
                         if (pattern[z_value] == str[pos + z_value - m] && z_value < m) {
                             z_value++;
                         } else {
-                            if (pos - m == count) isComplete = true;
                             break;
                         }
 
@@ -71,9 +85,7 @@ public:
             if (pos + z_value - 1 > right) {
                 left = pos;
                 right = pos + z_value - 1;
-                //if (str.length() >= left - m) {
-                //    str = str.substr(left - m, str.length() - left + m);
-                //}
+                
             }
 
             
