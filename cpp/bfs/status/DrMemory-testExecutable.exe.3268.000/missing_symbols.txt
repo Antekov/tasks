@@ -1,0 +1,14 @@
+M:\mingw-w64\i686-8.1.0-win32-dwarf-rt_v6-rev0\mingw32\bin\libgcc_s_dw2-1.dll
+M:\mingw-w64\i686-8.1.0-win32-dwarf-rt_v6-rev0\mingw32\bin\libstdc++-6.dll
+C:\WINDOWS\SYSTEM32\apphelp.dll
+C:\WINDOWS\System32\IMM32.DLL
+C:\WINDOWS\System32\KERNELBASE.dll
+C:\WINDOWS\System32\ucrtbase.dll
+C:\WINDOWS\System32\USER32.dll
+C:\WINDOWS\System32\GDI32.dll
+C:\WINDOWS\System32\msvcp_win.dll
+C:\WINDOWS\System32\win32u.dll
+C:\WINDOWS\System32\gdi32full.dll
+C:\WINDOWS\System32\msvcrt.dll
+C:\WINDOWS\System32\KERNEL32.DLL
+C:\WINDOWS\SYSTEM32\ntdll.dll

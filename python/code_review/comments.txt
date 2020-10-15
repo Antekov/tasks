@@ -1,0 +1,251 @@
+/*> @@ -0,0 +1,69 @@
+
++import os
+
++import os.path
+
++import shutil
+
++
+
++commands = ['ls', 'pwd', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir', 'run', 'exit']
+
++
+
++
+
++while True:
+
++    cmd = input('$ ')
+
++    cmd_parts = cmd.split()
+
++
+
++    if cmd_parts[0] in commands:
+
+Упадём тут, если ничего не введём
+
+In shell.py:
+
+> @@ -0,0 +1,69 @@
+
++import os
+
++import os.path
+
++import shutil
+
++
+
++commands = ['ls', 'pwd', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir', 'run', 'exit']
+
++
+
++
+
++while True:
+
++    cmd = input('$ ')
+
++    cmd_parts = cmd.split()
+
++
+
++    if cmd_parts[0] in commands:
+
+Давай вынесем cmd_parts[0] в переменную - дальше она часто используется
+
+In shell.py:
+
+> @@ -0,0 +1,69 @@
+
++import os
+
++import os.path
+
++import shutil
+
++
+
++commands = ['ls', 'pwd', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir', 'run', 'exit']
+
++
+
++
+
++while True:
+
++    cmd = input('$ ')
+
++    cmd_parts = cmd.split()
+
++
+
++    if cmd_parts[0] in commands:
+
+Можно уменьшить уровень вложенности:
+
+if cmd_parts[0] not in commands:
+
+    continue
+
+In shell.py:
+
+> @@ -0,0 +1,69 @@
+
++import os
+
++import os.path
+
++import shutil
+
++
+
++commands = ['ls', 'pwd', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir', 'run', 'exit']
+
++
+
++
+
++while True:
+
++    cmd = input('$ ')
+
++    cmd_parts = cmd.split()
+
++
+
++    if cmd_parts[0] in commands:
+
++        if cmd_parts[0] == commands[0]:
+
+Давай явно проверять cmd_parts[0] == 'ls'. Это легче читается и ничего не сломается при добавлении новых команд в commands.
+
+In shell.py:
+
+> @@ -0,0 +1,69 @@
+
++import os
+
++import os.path
+
++import shutil
+
++
+
++commands = ['ls', 'pwd', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir', 'run', 'exit']
+
++
+
++
+
++while True:
+
++    cmd = input('$ ')
+
++    cmd_parts = cmd.split()
+
++
+
++    if cmd_parts[0] in commands:
+
++        if cmd_parts[0] == commands[0]:
+
++            for name in os.listdir():
+
+Лучше выводить одной строкой
+
+In shell.py:
+
+> @@ -0,0 +1,69 @@
+
++import os
+
++import os.path
+
++import shutil
+
++
+
++commands = ['ls', 'pwd', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir', 'run', 'exit']
+
++
+
++
+
++while True:
+
++    cmd = input('$ ')
+
++    cmd_parts = cmd.split()
+
++
+
++    if cmd_parts[0] in commands:
+
++        if cmd_parts[0] == commands[0]:
+
++            for name in os.listdir():
+
+ls без параметров не выводит названия файлов и папок, начинающихся с .. Здесь мы выведем .git, но заигнорим . и ...
+
+In shell.py:
+
+> +
+
++while True:
+
++    cmd = input('$ ')
+
++    cmd_parts = cmd.split()
+
++
+
++    if cmd_parts[0] in commands:
+
++        if cmd_parts[0] == commands[0]:
+
++            for name in os.listdir():
+
++                print('{1:10}{0: <80}'.format(name, '<dir>'
+
++                                              if os.path.isdir(name) else ''))
+
++
+
++        elif cmd_parts[0] == commands[1]:
+
++            print(os.getcwd())
+
++        elif cmd_parts[0] == commands[2]:
+
++            try:
+
++                os.chdir(cmd_parts[1])
+
+Давай явно проверять наличие cmd_parts[1]. Ошибка "list index out of range" не очень красивая.
+
+In shell.py:
+
+> @@ -0,0 +1,69 @@
+
++import os
+
++import os.path
+
++import shutil
+
++
+
++commands = ['ls', 'pwd', 'cd', 'cp', 'mv', 'rm', 'rmdir', 'mkdir', 'run', 'exit']
+
++
+
++
+
++while True:
+
++    cmd = input('$ ')
+
+Если будешь писать тесты (вторая доп.часть), то без отдельной функции не обойтись. Давай вынесем в неё исполнение одной команды.

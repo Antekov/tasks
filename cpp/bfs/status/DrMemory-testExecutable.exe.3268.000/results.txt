@@ -1,0 +1,83 @@
+Dr. Memory version 2.3.0 build 1 built on Feb  6 2020 06:09:03
+Windows version: WinVer=105;Rel=1909;Build=18363;Edition=Core
+Dr. Memory results for pid 3268: "testExecutable.exe"
+Application cmdline: ".\project_build\testExecutable.exe"
+Recorded 118 suppression(s) from default M:\Program Files (x86)\Dr. Memory\bin\suppress-default.txt
+System call information is missing for this operating system: WinVer=105;Rel=1909;Build=18363;Edition=Core.
+
+Error #1: POSSIBLE LEAK 44 direct bytes 0x035b00f8-0x035b0124 + 0 indirect bytes
+# 0 replace_malloc                    [d:\drmemory_package\common\alloc_replace.c:2577]
+# 1 msvcrt.dll!realloc               +0x414    (0x770d7a85 <msvcrt.dll+0x47a85>)
+# 2 msvcrt.dll!unlock                +0x3e9    (0x770f73ca <msvcrt.dll+0x673ca>)
+# 3 msvcrt.dll!_getmainargs          +0x18     (0x770c5c69 <msvcrt.dll+0x35c69>)
+# 4 pre_cpp_init      
+# 5 __tmainCRTStartup 
+# 6 KERNEL32.dll!BaseThreadInitThunk +0x18     (0x77186359 <KERNEL32.dll+0x16359>)
+
+Error #2: LEAK 12 direct bytes 0x035b2e10-0x035b2e1c + 16 indirect bytes
+# 0 replace_operator_new                                           [d:\drmemory_package\common\alloc_replace.c:2900]
+# 1 successors        
+# 2 BFS               
+# 3 ____C_A_T_C_H____T_E_S_T____0
+# 4 Catch::TestInvokerAsFunction::invoke
+# 5 Catch::TestCase::invoke
+# 6 Catch::RunContext::invokeActiveTestCase
+# 7 Catch::RunContext::runCurrentTest
+# 8 Catch::RunContext::runTest
+# 9 Catch::(anonymous namespace)::TestGroup::execute
+#10 Catch::Session::runInternal
+#11 Catch::Session::run
+
+Error #3: LEAK 12 direct bytes 0x035b5ce8-0x035b5cf4 + 16 indirect bytes
+# 0 replace_operator_new                                           [d:\drmemory_package\common\alloc_replace.c:2900]
+# 1 successors        
+# 2 BFS               
+# 3 ____C_A_T_C_H____T_E_S_T____3
+# 4 Catch::TestInvokerAsFunction::invoke
+# 5 Catch::TestCase::invoke
+# 6 Catch::RunContext::invokeActiveTestCase
+# 7 Catch::RunContext::runCurrentTest
+# 8 Catch::RunContext::runTest
+# 9 Catch::(anonymous namespace)::TestGroup::execute
+#10 Catch::Session::runInternal
+#11 Catch::Session::run
+
+Error #4: LEAK 12 direct bytes 0x035b6508-0x035b6514 + 16 indirect bytes
+# 0 replace_operator_new                                           [d:\drmemory_package\common\alloc_replace.c:2900]
+# 1 successors        
+# 2 BFS               
+# 3 ____C_A_T_C_H____T_E_S_T____6
+# 4 Catch::TestInvokerAsFunction::invoke
+# 5 Catch::TestCase::invoke
+# 6 Catch::RunContext::invokeActiveTestCase
+# 7 Catch::RunContext::runCurrentTest
+# 8 Catch::RunContext::runTest
+# 9 Catch::(anonymous namespace)::TestGroup::execute
+#10 Catch::Session::runInternal
+#11 Catch::Session::run
+
+===========================================================================
+FINAL SUMMARY:
+
+DUPLICATE ERROR COUNTS:
+	Error #   2:     17
+	Error #   3:      5
+	Error #   4:      5
+
+SUPPRESSIONS USED:
+
+ERRORS FOUND:
+      0 unique,     0 total unaddressable access(es)
+      0 unique,     0 total uninitialized access(es)
+      0 unique,     0 total invalid heap argument(s)
+      0 unique,     0 total GDI usage error(s)
+      0 unique,     0 total handle leak(s)
+      0 unique,     0 total warning(s)
+      3 unique,    27 total,    756 byte(s) of leak(s)
+      1 unique,     1 total,     44 byte(s) of possible leak(s)
+ERRORS IGNORED:
+      2 potential error(s) (suspected false positives)
+         (details: C:\Users\antek\source\repos\bfs\status\DrMemory-testExecutable.exe.3268.000\potential_errors.txt)
+      3 unique,     3 total,     51 byte(s) of still-reachable allocation(s)
+         (re-run with "-show_reachable" for details)
+Details: C:\Users\antek\source\repos\bfs\status\DrMemory-testExecutable.exe.3268.000\results.txt

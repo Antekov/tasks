@@ -1,0 +1,29 @@
+Dr. Memory version 2.3.0 build 1 built on Feb  6 2020 06:09:03
+Windows version: WinVer=105;Rel=1909;Build=18363;Edition=Core
+Dr. Memory results for pid 900: "testExecutable.exe"
+Application cmdline: ".\project_build\testExecutable.exe"
+Recorded 118 suppression(s) from default M:\Program Files (x86)\Dr. Memory\bin\suppress-default.txt
+System call information is missing for this operating system: WinVer=105;Rel=1909;Build=18363;Edition=Core.
+
+===========================================================================
+FINAL SUMMARY:
+
+DUPLICATE ERROR COUNTS:
+
+SUPPRESSIONS USED:
+
+NO ERRORS FOUND:
+      0 unique,     0 total unaddressable access(es)
+      0 unique,     0 total uninitialized access(es)
+      0 unique,     0 total invalid heap argument(s)
+      0 unique,     0 total GDI usage error(s)
+      0 unique,     0 total handle leak(s)
+      0 unique,     0 total warning(s)
+      0 unique,     0 total,      0 byte(s) of leak(s)
+      0 unique,     0 total,      0 byte(s) of possible leak(s)
+ERRORS IGNORED:
+      2 potential error(s) (suspected false positives)
+         (details: C:\Users\antek\source\repos\bfs\status\DrMemory-testExecutable.exe.900.000\potential_errors.txt)
+      3 unique,     3 total,     51 byte(s) of still-reachable allocation(s)
+         (re-run with "-show_reachable" for details)
+Details: C:\Users\antek\source\repos\bfs\status\DrMemory-testExecutable.exe.900.000\results.txt

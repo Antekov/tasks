@@ -1,0 +1,60 @@
+Dr. Memory version 2.3.0 build 1 built on Feb  6 2020 06:09:03
+Dr. Memory errors that are likely to be false positives, for pid 3268: "testExecutable.exe"
+These errors matched the blacklist 'C:\WINDOWS*.d??' for 4 frames.
+Run with -lib_blacklist_frames 0 to treat these as regular errors.
+If these are all false positives and your focus is unaddressable errors, consider running with -light to skip all uninitialized reads and leaks for higher performance.
+
+Potential Error #1: HANDLE LEAK: KERNEL handle 0x000001a0 and 0 similar handle(s) were opened but not closed:
+# 0 system call NtCreateSemaphore                      
+# 1 KERNELBASE.dll!CreateSemaphoreExW                                +0x4a     (0x7570f0eb <KERNELBASE.dll+0xef0eb>)
+# 2 KERNELBASE.dll!CreateSemaphoreW                                  +0x1c     (0x75740ead <KERNELBASE.dll+0x120ead>)
+# 3 libstdc++-6.dll!?                                                +0x0      (0x6fe4bfd1 <libstdc++-6.dll+0xbfd1>)
+# 4 libstdc++-6.dll!?                                                +0x0      (0x6fe5a7c3 <libstdc++-6.dll+0x1a7c3>)
+# 5 libstdc++-6.dll!?                                                +0x0      (0x6fe4bd86 <libstdc++-6.dll+0xbd86>)
+# 6 libstdc++-6.dll!?                                                +0x0      (0x6fefc0c9 <libstdc++-6.dll+0xbc0c9>)
+# 7 Catch::Colour::use
+# 8 Catch::Colour::Colour
+# 9 Catch::ConsoleReporter::printTotalsDivider
+#10 Catch::ConsoleReporter::testRunEnded
+#11 Catch::RunContext::~RunContext
+#12 Catch::(anonymous namespace)::TestGroup::~TestGroup
+#13 Catch::Session::runInternal
+#14 Catch::Session::run
+#15 Catch::Session::run<>                                             [../../../../../src/gcc-8.1.0/libgcc/config/i386/cygwin.S:164]
+#16 main              
+Note: @0:00:23.393 in thread 6308
+
+Potential Error #2: HANDLE LEAK: KERNEL handle 0x000001ac and 0 similar handle(s) were opened but not closed:
+# 0 system call NtCreateSemaphore                   
+# 1 KERNELBASE.dll!CreateSemaphoreExW                             +0x4a     (0x7570f0eb <KERNELBASE.dll+0xef0eb>)
+# 2 KERNELBASE.dll!CreateSemaphoreW                               +0x1c     (0x75740ead <KERNELBASE.dll+0x120ead>)
+# 3 libgcc_s_dw2-1.dll!?                                          +0x0      (0x6eb55d52 <libgcc_s_dw2-1.dll+0x15d52>)
+# 4 libgcc_s_dw2-1.dll!?                                          +0x0      (0x6eb55f60 <libgcc_s_dw2-1.dll+0x15f60>)
+# 5 libstdc++-6.dll!?                                             +0x0      (0x6fefc01f <libstdc++-6.dll+0xbc01f>)
+# 6 libstdc++-6.dll!?                                             +0x0      (0x6fef11c8 <libstdc++-6.dll+0xb11c8>)
+# 7 Catch::uncaught_exceptions
+# 8 ____C_A_T_C_H____T_E_S_T____0
+# 9 Catch::TestInvokerAsFunction::invoke
+#10 Catch::TestCase::invoke
+#11 Catch::RunContext::invokeActiveTestCase
+#12 Catch::RunContext::runCurrentTest
+#13 Catch::RunContext::runTest
+#14 Catch::(anonymous namespace)::TestGroup::execute
+#15 Catch::Session::runInternal
+#16 Catch::Session::run
+#17 Catch::Session::run<>                                          [../../../../../src/gcc-8.1.0/libgcc/config/i386/cygwin.S:164]
+#18 main              
+Note: @0:00:23.395 in thread 6308
+
+DUPLICATE POTENTIAL ERROR COUNTS:
+
+POTENTIAL ERRORS FOUND:
+      0 unique,     0 total potential unaddressable access(es)
+      0 unique,     0 total potential uninitialized access(es)
+      0 unique,     0 total potential invalid heap argument(s)
+      0 unique,     0 total potential GDI usage error(s)
+      2 unique,     2 total potential handle leak(s)
+      0 unique,     0 total potential warning(s)
+      0 unique,     0 total,      0 byte(s) of potential leak(s)
+      0 unique,     0 total,      0 byte(s) of potential possible leak(s)
+Details: C:\Users\antek\source\repos\bfs\status\DrMemory-testExecutable.exe.3268.000\potential_errors.txt

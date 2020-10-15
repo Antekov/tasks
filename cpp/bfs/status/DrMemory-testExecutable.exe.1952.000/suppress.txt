@@ -1,0 +1,122 @@
+# File for suppressing errors found in pid 1952: "testExecutable.exe"
+
+# Suppression for Error #1
+REACHABLE LEAK
+name=Error #1 (update to meaningful name)
+
+## Mod+offs-style suppression for Error #1:
+REACHABLE LEAK
+name=Error #1 (update to meaningful name)
+
+# Suppression for Error #2
+REACHABLE LEAK
+name=Error #2 (update to meaningful name)
+
+## Mod+offs-style suppression for Error #2:
+REACHABLE LEAK
+name=Error #2 (update to meaningful name)
+
+# Suppression for Error #3
+REACHABLE LEAK
+name=Error #3 (update to meaningful name)
+
+## Mod+offs-style suppression for Error #3:
+REACHABLE LEAK
+name=Error #3 (update to meaningful name)
+
+# Suppression for Error #4
+LEAK
+name=Error #4 (update to meaningful name)
+drmemorylib.dll!replace_operator_new
+testExecutable.exe!successors
+testExecutable.exe!BFS
+testExecutable.exe!____C_A_T_C_H____T_E_S_T____0
+testExecutable.exe!Catch::TestInvokerAsFunction::invoke
+testExecutable.exe!Catch::TestCase::invoke
+testExecutable.exe!Catch::RunContext::invokeActiveTestCase
+testExecutable.exe!Catch::RunContext::runCurrentTest
+testExecutable.exe!Catch::RunContext::runTest
+testExecutable.exe!Catch::(anonymous namespace)::TestGroup::execute
+testExecutable.exe!Catch::Session::runInternal
+testExecutable.exe!Catch::Session::run
+
+## Mod+offs-style suppression for Error #4:
+LEAK
+name=Error #4 (update to meaningful name)
+<drmemorylib.dll+0x306f0>
+<testExecutable.exe+0x2349f>
+<testExecutable.exe+0x236a5>
+<testExecutable.exe+0x23a42>
+<testExecutable.exe+0x14027>
+<testExecutable.exe+0x13566>
+<testExecutable.exe+0xee96>
+<testExecutable.exe+0xec76>
+<testExecutable.exe+0xdbee>
+<testExecutable.exe+0x101a0>
+<testExecutable.exe+0x111d7>
+<testExecutable.exe+0x10f66>
+
+# Suppression for Error #5
+LEAK
+name=Error #5 (update to meaningful name)
+drmemorylib.dll!replace_operator_new
+testExecutable.exe!successors
+testExecutable.exe!BFS
+testExecutable.exe!____C_A_T_C_H____T_E_S_T____3
+testExecutable.exe!Catch::TestInvokerAsFunction::invoke
+testExecutable.exe!Catch::TestCase::invoke
+testExecutable.exe!Catch::RunContext::invokeActiveTestCase
+testExecutable.exe!Catch::RunContext::runCurrentTest
+testExecutable.exe!Catch::RunContext::runTest
+testExecutable.exe!Catch::(anonymous namespace)::TestGroup::execute
+testExecutable.exe!Catch::Session::runInternal
+testExecutable.exe!Catch::Session::run
+
+## Mod+offs-style suppression for Error #5:
+LEAK
+name=Error #5 (update to meaningful name)
+<drmemorylib.dll+0x306f0>
+<testExecutable.exe+0x2349f>
+<testExecutable.exe+0x236a5>
+<testExecutable.exe+0x23cdd>
+<testExecutable.exe+0x14027>
+<testExecutable.exe+0x13566>
+<testExecutable.exe+0xee96>
+<testExecutable.exe+0xec76>
+<testExecutable.exe+0xdbee>
+<testExecutable.exe+0x101a0>
+<testExecutable.exe+0x111d7>
+<testExecutable.exe+0x10f66>
+
+# Suppression for Error #6
+LEAK
+name=Error #6 (update to meaningful name)
+drmemorylib.dll!replace_operator_new
+testExecutable.exe!successors
+testExecutable.exe!BFS
+testExecutable.exe!____C_A_T_C_H____T_E_S_T____6
+testExecutable.exe!Catch::TestInvokerAsFunction::invoke
+testExecutable.exe!Catch::TestCase::invoke
+testExecutable.exe!Catch::RunContext::invokeActiveTestCase
+testExecutable.exe!Catch::RunContext::runCurrentTest
+testExecutable.exe!Catch::RunContext::runTest
+testExecutable.exe!Catch::(anonymous namespace)::TestGroup::execute
+testExecutable.exe!Catch::Session::runInternal
+testExecutable.exe!Catch::Session::run
+
+## Mod+offs-style suppression for Error #6:
+LEAK
+name=Error #6 (update to meaningful name)
+<drmemorylib.dll+0x306f0>
+<testExecutable.exe+0x2349f>
+<testExecutable.exe+0x236a5>
+<testExecutable.exe+0x23f78>
+<testExecutable.exe+0x14027>
+<testExecutable.exe+0x13566>
+<testExecutable.exe+0xee96>
+<testExecutable.exe+0xec76>
+<testExecutable.exe+0xdbee>
+<testExecutable.exe+0x101a0>
+<testExecutable.exe+0x111d7>
+<testExecutable.exe+0x10f66>
+
