@@ -45,7 +45,7 @@ class Solution {
     }
 
     bool isComplete() {
-        return (pos == count);
+        return (pos > count);
     }
 
     
