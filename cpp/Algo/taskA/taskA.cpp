@@ -3,7 +3,7 @@
 #include <vector>
 
 class Solution {
-    std::string pattern, str, cstr;
+    std::string pattern, str, buffer;
     std::vector<size_t> entries;
     std::vector<size_t> z;
     size_t left, right, pos;
@@ -12,17 +12,17 @@ class Solution {
     int buffer_size;
 
     void add(char ch) {
-        str += ch;
+        //str += ch;
         count++;
 
-        if (cstr.length() < buffer_size) {
-            cstr += ch;
+        if (buffer.length() < buffer_size) {
+            buffer += ch;
         } else {
-            cstr[count % buffer_size] = ch;
+            buffer[count % buffer_size] = ch;
         }
 
-        std::cout << str << std::endl;
-        std::cout << cstr << std::endl;
+        //std::cout << str << std::endl;
+        //std::cout << buffer << std::endl;
     }
 
     char get(size_t shift) {
@@ -39,7 +39,11 @@ class Solution {
     char getc(size_t shift) {
         char ch;
 
-        ch = cstr[(shift + 1) % buffer_size];
+        if (shift < buffer_size) {
+            return buffer[shift];
+        }
+
+        ch = buffer[(shift + 1) % buffer_size];
         
         return ch;
     }
@@ -53,7 +57,7 @@ public:
     Solution(std::string &pattern) : 
         pattern(pattern), 
         str(pattern),
-        cstr(pattern),
+        buffer(pattern),
         m(pattern.length()), 
         count(m),
         buffer_size(m+1) {}
@@ -67,7 +71,7 @@ public:
         
 
         while (!isComplete()) {
-            std::cout << "pos | left | right | count = " << pos << " | " << left << " | " << right << " | " << count << std::endl;
+            //std::cout << "pos | left | right | count = " << pos << " | " << left << " | " << right << " | " << count << std::endl;
             
             if (pos <= right) {
                 z_value = std::min(right - pos + 1, z[pos - left]);
@@ -76,7 +80,7 @@ public:
             }
             while (true) {
                 if (pos + z_value < m) {
-                    // std::cout << "p[" << z_value << "]=" << pattern[z_value] << std::endl;
+                    //std::cout << "p[" << z_value << "]=" << pattern[z_value] << std::endl;
                     if (pattern[z_value] == pattern[pos + z_value] && z_value < m) {
                         z_value++;
                     } else {
@@ -89,9 +93,9 @@ public:
                             add(ch);
                         }
 
-                    //std::cout << "t[" << pos + z_value << "]=" << ch << std::endl;
-                    std::cout << " get[" << pos + z_value << "]=" << get(pos + z_value) << std::endl;
-                    std::cout << "getc[" << pos + z_value << "]=" << getc(pos + z_value) << std::endl;
+                    
+                    //std::cout << " get[" << pos + z_value << "]=" << get(pos + z_value) << std::endl;
+                    //std::cout << "getc[" << pos + z_value << "]=" << getc(pos + z_value) << std::endl;
                     if (pos + z_value < count && pattern[z_value] == getc(pos + z_value) && z_value < m) {
                         z_value++;
                     } else {
@@ -99,7 +103,7 @@ public:
                     }
                 }  
             }
-            std::cout << "z[" << pos << "]=" << z_value << std::endl;
+            //std::cout << "z[" << pos << "]=" << z_value << std::endl;
             
             if (pos < m) {
                 z[pos] = z_value;
