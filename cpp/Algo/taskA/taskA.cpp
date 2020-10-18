@@ -4,9 +4,7 @@
 
 class Solution {
     std::string pattern_, buffer_;
-    std::vector<size_t> entries_;
-    
-    size_t left, right, pos;
+            
     size_t symbol_count_;
     size_t buffer_size_;
 
@@ -27,65 +25,55 @@ class Solution {
 
         return buffer_[(index + 1) % buffer_size_];
     }
-
-    bool isComplete() {
-        return (pos > symbol_count_);
-    }
     
 public:
-    Solution(std::string &pattern_) : 
-        pattern_(pattern_),
-        buffer_(pattern_),
-        symbol_count_(pattern_.length()), 
-        buffer_size_(pattern_.length() + 1) {}
+    Solution(std::string &pattern) : 
+        pattern_(pattern),
+        buffer_(pattern),
+        symbol_count_(pattern.length()), 
+        buffer_size_(pattern.length() + 1) {}
 
     std::vector<size_t> solve() {
         char ch;
         size_t z_value = 0;
-        size_t m = pattern_.length();
-        std::vector<size_t> z_function(m);
+        std::vector<size_t> z_function(pattern_.length());
+        std::vector<size_t> entries;
+        size_t left, right, pos;
 
         z_function[0] = 0;
         pos = 1;
         left = 0;
         right = 0;
         
-        while (!isComplete()) {
-            //std::cout << "pos | left | right | symbol_count_ = " << pos << " | " << left << " | " << right << " | " << symbol_count_ << std::endl;
-            
+        while (pos <= symbol_count_) {
             if (pos <= right) {
                 z_value = std::min(right - pos + 1, z_function[pos - left]);
             } else {
                 z_value = 0;
             }
             while (true) {
-                if (pos + z_value < m) {
-                    //std::cout << "p[" << z_value << "]=" << pattern_[z_value] << std::endl;
-                    if (pattern_[z_value] == pattern_[pos + z_value] && z_value < m) {
+                if (pos + z_value < pattern_.length()) {
+                    if (pattern_[z_value] == pattern_[pos + z_value] && z_value < pattern_.length()) {
                         z_value++;
                     } else {
                         break;
                     }
                 } else {
-                    
-                    if (pos + z_value >= symbol_count_ - 1)
+                    if (pos + z_value >= symbol_count_ - 1) {
                         if (std::cin >> ch) {
                             addSymbol(ch);
                         }
+                    }
 
-                    
-                    //std::cout << " get[" << pos + z_value << "]=" << get(pos + z_value) << std::endl;
-                    //std::cout << "getc[" << pos + z_value << "]=" << getc(pos + z_value) << std::endl;
-                    if (pos + z_value < symbol_count_ && pattern_[z_value] == getSymbol(pos + z_value) && z_value < m) {
+                    if (pos + z_value < symbol_count_ && pattern_[z_value] == getSymbol(pos + z_value) && z_value < pattern_.length()) {
                         z_value++;
                     } else {
                         break;
                     }
                 }  
             }
-            //std::cout << "z[" << pos << "]=" << z_value << std::endl;
             
-            if (pos < m) {
+            if (pos < pattern_.length()) {
                 z_function[pos] = z_value;
             }
 
@@ -94,17 +82,15 @@ public:
                 right = pos + z_value - 1;
             }
 
-            if (pos >= m && z_value == m) {
-                entries_.push_back(pos - m);
+            if (pos >= pattern_.length() && z_value == pattern_.length()) {
+                entries.push_back(pos - pattern_.length());
             }
         
             pos++;
         }
-        return entries_;
+        return entries;
     }
 };
-
-
 
 int main() {
     std::string pattern;
