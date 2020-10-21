@@ -1,5 +1,0 @@
-if(EXISTS "C:/Users/antek/source/repos/bfs/project_build/testExecutable_tests-b858cb2.cmake")
-  include("C:/Users/antek/source/repos/bfs/project_build/testExecutable_tests-b858cb2.cmake")
-else()
-  add_test(testExecutable_NOT_BUILT-b858cb2 testExecutable_NOT_BUILT-b858cb2)
-endif()

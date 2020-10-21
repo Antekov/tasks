@@ -1,7 +1,0 @@
-add_test( [==[Example 1]==] C:/Users/antek/source/repos/bfs/project_build/testExecutable.exe [==[Example 1]==])
-set_tests_properties( [==[Example 1]==] PROPERTIES WORKING_DIRECTORY C:/Users/antek/source/repos/bfs/project_build)
-add_test( [==[Example 2]==] C:/Users/antek/source/repos/bfs/project_build/testExecutable.exe [==[Example 2]==])
-set_tests_properties( [==[Example 2]==] PROPERTIES WORKING_DIRECTORY C:/Users/antek/source/repos/bfs/project_build)
-add_test( [==[Example 3]==] C:/Users/antek/source/repos/bfs/project_build/testExecutable.exe [==[Example 3]==])
-set_tests_properties( [==[Example 3]==] PROPERTIES WORKING_DIRECTORY C:/Users/antek/source/repos/bfs/project_build)
-set( testExecutable_TESTS [==[Example 1]==] [==[Example 2]==] [==[Example 3]==])
