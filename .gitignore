@@ -1,4 +1,7 @@
 *.exe
+*.dll
 *.log
 temp*
 .vs*
+*/*/obj/*
+*/*/bin/*
