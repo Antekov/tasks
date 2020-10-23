@@ -1,162 +1,160 @@
 #include <map>
-#include <vector>
 #include <iostream>
+#include <sstream>
+#include <cstdio>
+#include <cstring>
 
 using namespace std;
-const int MAXN = 1000000;
+const int N = 1005000;
 
-struct node{
-    int l, r, par, link; //s[l..r-1] подстрока, написанная на ведущем в вершину ребре
-    std::map<char, int> next;
-    node(int l=-1, int r=-1, int par=-1) : l(l), r(r), par(par){ }
-};
-
-struct position{
-    int V, L;
-    position(int V, int L) : V(V), L(L) {}
-};
-
-node t[MAXN];
-string s;
+char s[N];
 int szt, szs;
+char s1[N];
+int len1, len2;
 
-int leng(int v){
-    return t[v].r - t[v].l;
+struct node {
+	int l, r, par, link;
+	map<int,int> next;
+ 
+	node (int l=0, int r=0, int par=-1)
+		: l(l), r(r), par(par), link(-1) {}
+	int len()  {  return r - l;  }
+	int &get (int c) {
+		if (!next.count(c))  next[c] = -1;
+		return next[c];
+	}
+};
+
+node t[N];
+node t1[N];
+int m2[N];
+
+ 
+struct position {
+	int v, pos;
+	position (int v, int pos) : v(v), pos(pos)  {}
+};
+position ptr (0, 0);
+ 
+position go_down(position st, int l, int r) {
+	while (l < r)
+		if (st.pos == t[st.v].len()) {
+			st = position (t[st.v].get( s[l] ), 0);
+			if (st.v == -1)  return st;
+		}
+		else {
+			if (s[ t[st.v].l + st.pos ] != s[l])
+				return position (-1, -1);
+			if (r-l < t[st.v].len() - st.pos)
+				return position (st.v, st.pos + r-l);
+			l += t[st.v].len() - st.pos;
+			st.pos = t[st.v].len();
+		}
+	return st;
 }
-int add_edge_to_parent(int l, int r, int parent){
-    int nidx = szt++;
-    t[nidx] = node(l, r, parent);
-    return (t[parent].next[s[l]] = nidx);
+ 
+int split_edge(position st) {
+	if (st.pos == t[st.v].len())
+		return st.v;
+	if (st.pos == 0)
+		return t[st.v].par;
+	node v = t[st.v];
+	int id = szt++;
+	t[id] = node (v.l, v.l+st.pos, v.par);
+	t[v.par].get( s[v.l] ) = id;
+	t[id].get( s[v.l+st.pos] ) = st.v;
+	t[st.v].par = id;
+	t[st.v].l += st.pos;
+	return id;
 }
-
-int split_edge(position pos){
-    int v = pos.V, up = pos.L, down = leng(v) - up;
-
-    if (up == 0) return v;
-    if (down == 0) return t[v].par; 
-
-    int mid = add_edge_to_parent(t[v].l, t[v].l + down, t[v].par);
-    t[v].l += down, t[v].par = mid;
-    t[mid].next[s[t[v].l]] = v;
-    return mid;
-}
-
-position read_char(position pos, char c){
-    int v = pos.V, up = pos.L;
-    if (up > 0)
-        return s[t[v].r] == c ? position(v, up - 1) : position(-1, -1);
-    else {
-        int nextv = t[v].next.count(c) ? t[v].next[c] : -1;
-        return nextv != -1 ? position(nextv, leng(nextv) - 1) : position(-1, -1);
-    }
-}
-position fast_go_down(int v, int l, int r){
-    if (l == r) return position(v, 0);
-
-    while (true) {
-        v = t[v].next[s[l]];
-        if (leng(v) >= r - l)
-            return position(v, leng(v) - r + l);
-        l += leng(v);
-    }
-    throw;
-}
-
-
+ 
 int link(int v) {
-    if (t[v].link == -1)
-        t[v].link = split_edge(fast_go_down(link(t[v].par), t[v].l + int(t[v].par == 0), t[v].r));
-    return t[v].link;
+	if (t[v].link!= -1)  return t[v].link;
+	if (t[v].par == -1)  return 0;
+	int to = link(t[v].par);
+	return t[v].link= split_edge(go_down(position(to,t[to].len()), t[v].l + (t[v].par==0), t[v].r));
+}
+ 
+void add_char_to_tree(int pos) {
+	while(true) {
+		position nptr = go_down(ptr, pos, pos+1);
+		if (nptr.v != -1) {
+			ptr = nptr;
+			return;
+		}
+ 
+		int mid = split_edge(ptr);
+		int leaf = szt++;
+		t[leaf] = node (pos, szs, mid);
+		t[mid].get( s[pos] ) = leaf;
+ 
+		ptr.v = link(mid);
+		ptr.pos = t[ptr.v].len();
+		if (!mid)  break;
+	}
+}
+  
+void build_tree() {
+	szt = 1;
+    szs = strlen(s);
+	for (int i = 0; i < szs; i++)
+		add_char_to_tree(i);
 }
 
-position add_char_to_tree(position pos, int i) {
-    while(true){
-        position npos = read_char(pos, s[i]);
-        if (npos.V != -1) return npos;
-
-        int mid = split_edge(pos);
-
-        add_edge_to_parent(i, szs, mid);
-
-        pos = position(link(mid), 0);
-
-        if (mid == 0)
-            return pos;
-    }
-    throw;
-}
-
-
-
-
-void make_tree() {
-    szt = 0;
-    szs = s.length();
-    node root(-1, -1, -1); 
-    root.link = 0;
-    t[szt++] = root;
-
-    position pos(0, 0);
-    for(int i = 0; i < szs; ++i) {
-        pos = add_char_to_tree(pos, i);
-    }
-}
-
-
-
-vector<pair<node, int>> nodes;
+int idx = 0;
 
 void dfs_index(int i = 0) {
-    nodes.push_back({t[i], i});
+    t1[idx] = t[i];
+    m2[i] = idx;
+    idx++;
+    
     for (auto next_node : t[i].next) {
-        //if (s[t[next_node.second].r] != '$') {
-            dfs_index(next_node.second);
-        //}
+        dfs_index(next_node.second);
     } 
 }
-
-
 
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     freopen("input.txt", "r", stdin);
+    
+    std::ostringstream out;
+    
 
-    string s1;
-    int len1, len2;
     cin >> s;
-    len1 = s.length();
+    len1 = strlen(s);
     cin >> s1;
-    len2 = s1.length();
-    s = s + s1;
+    len2 = strlen(s1);
+    memcpy(s + len1, s1, len2);
+    //s = s + s1;
+	out << s << endl;
 
-    make_tree(); 
-
-    cout << szt << endl;
+    build_tree();
     dfs_index();
 
-    for (int k = 1; k < nodes.size(); k++) {
-        auto node = nodes[k];
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes[i].second == node.first.par) {
-                cout << i;
-                break;
-            }
-        }
-        if (node.first.l >= len1) {
-            cout << " 1 " << node.first.l - len1 << ' ' << node.first.r - len1;
-        } else {
-            cout << " 0 " << node.first.l << ' ' << (node.first.r > len1 ? node.first.r - len1 : node.first.r);
-        }
-        
-        cout << " | ";
+    out << szt << "\n";
 
-        for (int j = node.first.l; j < node.first.r; j++) {
-            cout << s[j];
+    for (int k = 1; k < szt; k++) {
+        node &node = t1[k];
+        out << m2[node.par];
+
+        if (node.l >= len1) {
+            out << " 1 " << node.l - len1 << ' ' << node.r - len1;
+        } else {
+            out << " 0 " << node.l << ' ' << (node.r > len1 ? node.r - len2 : node.r);
         }
         
-        cout << endl;
+        out << " | ";
+
+        for (int j = node.l; j < node.r; j++) {
+            out << s[j];
+        }
+        
+        out << "\n";
     }
+    
+    
+    printf("%s", out.str().c_str());
     return 0;
 }
