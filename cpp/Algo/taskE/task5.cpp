@@ -107,10 +107,11 @@ void dfs_index(int i = 0) {
     t1[idx] = t[i];
     m2[i] = idx;
     idx++;
-    
-    for (auto next_node : t[i].next) {
-        dfs_index(next_node.second);
-    } 
+	if (s[t[i].r - 1] != '$') {
+		for (auto next_node : t[i].next) {
+			dfs_index(next_node.second);
+		}
+	}
 }
 
 
