@@ -1,8 +1,15 @@
-aa.b.b.*
-ababbab
+aab.a.*.aab.+*.ba.1+
+aababbb
 
-aabb...*
-aabba
+aabb...*..
+aabbaabbbb
+5
+
+()()* == ()1
+
+aa.b.b.*
+aababab
+3
 
 acb..bab.c.*.ab.ba.+.+*a.
 acbac
