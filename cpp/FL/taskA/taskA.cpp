@@ -9,30 +9,37 @@
 
 using namespace std;
 
-void print_state(set<size_t> q) {
-    std::cout << "{";
-    for (auto i : q) {
-        std::cout << i << ' ';
-    }
-    std::cout << "}";
-}
-
+// Структура узла синтаксического дерева
 struct Node {
-    char symbol;
+    // Символ в узле 
+    char symbol;  
+    
+    // Индекс символа, если это символ из алфавита языка,
+    // 0 - если это символ операции
     size_t index;
+
+    // Свойство узла - возможность быть пустым
     bool nullable;
+
+    // Свойство узла - множество индексов, которые соответствуют первым символам 
+    // в подцепочках, генерируемых подвыражением с вершиной в этом узле
     set<size_t> firstpos;
+
+    // Свойство узла - множество индексов, которым соответствуют последние символы
+    // в подцепочках, генерируемых подвыражениями с вершиной в этом узле
     set<size_t> lastpos;
 
+    // Левый и правый потомки узла
     Node *left;
     Node *right;
 
     Node(char symbol, size_t index=0, Node *left=nullptr, Node* right=nullptr) : 
         symbol(symbol), index(index), left(left), right(right) {
-
     }
 };
 
+
+// Вычисление свойств каждого узла обходом в глубину
 void dfs_properties(Node *root) {
     if (root->left != nullptr) {
         dfs_properties(root->left);
@@ -41,10 +48,13 @@ void dfs_properties(Node *root) {
         dfs_properties(root->right);
     }
 
-    std::cout << "Node " << root->symbol << "(" << root->index << ")" << endl;
+    std::cerr << "Node " << root->symbol << "(" << root->index << ")" << endl;
+
+    // Короткие названия потомков узла
     Node *u = root->left;
     Node *v = root->right;
 
+    // Если это узел с операцией сложения
     if (root->symbol == '+') {
         root->nullable = u->nullable || v->nullable;
 
@@ -84,15 +94,15 @@ void dfs_properties(Node *root) {
         root->lastpos = set<size_t>{root->index};
     }
 
-    std::cout << root->nullable << " | fp: ";
+    std::cerr << root->nullable << " | fp: ";
     for (auto i : root->firstpos) {
-        std::cout << i << ' ';
+        std::cerr << i << ' ';
     }
-    std::cout << "| lp: ";
+    std::cerr << "| lp: ";
     for (auto i : root->lastpos) {
-        std::cout << i << ' ';
+        std::cerr << i << ' ';
     }
-    std::cout << endl << endl;;
+    std::cerr << endl << endl;;
 }
 
 void dfs_followpos(Node *root, vector<set<size_t>> &followpos) {
@@ -103,7 +113,7 @@ void dfs_followpos(Node *root, vector<set<size_t>> &followpos) {
         dfs_followpos(root->right, followpos);
     }
 
-    std::cout << "Node " << root->symbol << "(" << root->index << ")" << endl;
+    std::cerr << "Node " << root->symbol << "(" << root->index << ")" << endl;
     Node *u = root->left;
     Node *v = root->right;
 
@@ -123,29 +133,39 @@ void dfs_followpos(Node *root, vector<set<size_t>> &followpos) {
         return;
     }
 
-    std::cout << root->nullable << " | fp: ";
+    std::cerr << root->nullable << " | fp: ";
     for (auto i : root->firstpos) {
-        std::cout << i << ' ';
+        std::cerr << i << ' ';
     }
-    std::cout << "| lp: ";
+    std::cerr << "| lp: ";
     for (auto i : root->lastpos) {
-        std::cout << i << ' ';
+        std::cerr << i << ' ';
     }
-    std::cout << endl << endl;;
+    std::cerr << endl << endl;;
 }
 
+// Печать одного из состояний ДКА
+void print_state(set<size_t> q) {
+    std::cerr << "{";
+    for (auto i : q) {
+        std::cerr << i << ' ';
+    }
+    std::cerr << "}";
+}
+
+// Орпеделние является ли состояние конечным по последнему индексу
 bool is_final_state(set<size_t> Q, size_t last_index) {
     return Q.count(last_index) > 0;
 }
 
 int main() {
+    //freopen("input.txt", "r", stdin);
+
     bool is_error = false;
     string re, u;
 
     // Массив символов алфавита, встречающичхся на разных позициях в РВ 
     vector<char> symbols;
-    
-    freopen("input.txt", "r", stdin);
     
     // Стек для разбора РВ в обратной польской записи
     stack<Node *> st;
@@ -260,13 +280,13 @@ int main() {
     // Обходим дерево узлов начиная с корня, рассчитывая followpos
     dfs_followpos(root, followpos);
 
-    std::cout << "folowpos(v):" << endl;
+    std::cerr << "folowpos(v):" << endl;
     for (size_t index = 1; index < followpos.size(); index++) {
-        std::cout << index << " | " << symbols[index] << " : ";
+        std::cerr << index << " | " << symbols[index] << " : ";
         for (auto x : followpos[index]) {
-            std::cout << x << ' ';
+            std::cerr << x << ' ';
         }
-        std::cout << endl;
+        std::cerr << endl;
     }
 
     // Построение ДКА по рассчитанным значениям followpos
@@ -345,14 +365,14 @@ int main() {
     // Индекс последнего символа в массиве symbols для определения конечных состояний
     size_t last_index = symbols.size() - 1;
 
-    std::cout << "DFA has states:" << endl;
+    std::cerr << "DFA has states:" << endl;
     for (size_t i = 0; i < Q.size(); i++) {
-        std::cout << "State Q[" << i << "] = {";
+        std::cerr << "State Q[" << i << "] = {";
         for (auto s : Q[i]) {
-            std::cout << s << ' ';
+            std::cerr << s << ' ';
         }
-        std::cout << "}, is final=";
-        std::cout << is_final_state(Q[i], last_index) << endl;
+        std::cerr << "}, is final=";
+        std::cerr << is_final_state(Q[i], last_index) << endl;
     }
 
     // Опредляем, какой максималный префикс строки u является префиксом слова из языка
@@ -367,10 +387,10 @@ int main() {
     // Признак, что ДКА есть куда совершить переход по очередному символу (ДКА "не умер")
     bool is_alive = true;
     
-    std::cout << endl <<"DFA start:" << endl;
-    std::cout << "$ -> ";
+    std::cerr << endl <<"DFA start:" << endl;
+    std::cerr << "$ -> ";
     print_state(q);
-    std::cout << endl;
+    std::cerr << endl;
 
     // Берем по одному символы из строки u, и если ДКА сможет совершить переход,
     // то увеличиваем max_prefix_len
@@ -379,9 +399,9 @@ int main() {
         // Вычисляем новое состояние ДКА, в которое он переходит из текущего q по символу ch
         q = D[{q, ch}];
             
-        std::cout << ch << " -> ";
+        std::cerr << ch << " -> ";
         print_state(q);
-        std::cout << endl;
+        std::cerr << endl;
 
         // Если текущее состояние - пустое множество, то ДКА умер.
         // Прерываем цикл, так как дальнейшие символы из строки u 
@@ -392,7 +412,7 @@ int main() {
         }        
     }
 
-    std::cout << "Max prefix len: ";
+    std::cerr << "Max prefix len: ";
     std::cout << max_prefix_len << endl;
 
     return 0;
