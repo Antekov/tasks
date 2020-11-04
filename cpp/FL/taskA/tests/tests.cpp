@@ -22,5 +22,5 @@ TEST_CASE("Example 2", "Example 2") {
 
     int res = solution.solve("ab+c.aba.*.bac.+.+*", "abacb");
     
-    REQUIRE(res == 4);
+    REQUIRE(res == 5);
 }
