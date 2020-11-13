@@ -2,7 +2,7 @@
 #include "task1source.hpp"
 
 int main() {
-    int N = 2;
+    int N = 4;
     double ans, ans1;
     double x1, y1, z1, x2, y2, z2;
     double x3, y3, z3, x4, y4, z4;
@@ -47,8 +47,9 @@ int main() {
                                         std::cout << x3 << ' ' << y3 << ' ' << z3 << std::endl;
                                         std::cout << x4 << ' ' << y4 << ' ' << z4 << std::endl;
                                         std::cout << ans << " != " << ans1 << std::endl;
+                                        //assert(false);
                                     } else {
-                                        std::cout << ans << " == " << ans1 << std::endl;
+                                        //std::cout << ans << " == " << ans1 << std::endl;
                                     }
                                 }    
                             }
