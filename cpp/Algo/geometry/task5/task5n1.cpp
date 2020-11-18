@@ -4,9 +4,16 @@ int main() {
     freopen("input.txt", "r", stdin);
     std::pair<int, int> numbers;
     
+    int n;
+    std::cin >> n;
 
-    numbers = n1::solve();
+    std::vector<std::vector<int>> seg(n, std::vector<int>(4,0));
+    for (int i = 0; i < n; i++) {
+        std::cin >> seg[i][0] >> seg[i][1] >> seg[i][2] >> seg[i][3];
+    }
 
+    numbers = n1::solve(seg);
+    
     if (numbers.first >= -10000) {
         std::cout << "YES" << std::endl;
         if (numbers.first < numbers.second) {
