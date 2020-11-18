@@ -42,11 +42,12 @@ int main() {
                                     ans1 = solve1(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
 
                                     if (abs(ans1 - ans) > 0.0000001) {
+                                        
                                         std::cout << x1 << ' ' << y1 << ' ' << z1 << std::endl;
                                         std::cout << x2 << ' ' << y2 << ' ' << z2 << std::endl;
                                         std::cout << x3 << ' ' << y3 << ' ' << z3 << std::endl;
                                         std::cout << x4 << ' ' << y4 << ' ' << z4 << std::endl;
-                                        std::cout << ans << " != " << ans1 << std::endl;
+                                        std::cout << std::setprecision(7) << ans << " != " << ans1 << std::endl;
                                         //assert(false);
                                     } else {
                                         //std::cout << ans << " == " << ans1 << std::endl;

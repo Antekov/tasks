@@ -79,7 +79,7 @@ public:
     }
 
     bool isCollinear(const Vector3D &a) const {
-        //std::cerr << "isCollinear: " << this->cosPhi(a) << " " << abs(abs(this->cosPhi(a)) - 1) << endl;
+        std::cerr << "isCollinear: " << this->cosPhi(a) << " " << abs(abs(this->cosPhi(a)) - 1) << std::endl;
         return (abs(abs(this->cosPhi(a)) - 1) <= DBL_EPSILON);
     }
 
@@ -94,19 +94,21 @@ Point3D::Point3D(const Vector3D& v) :
     Point3D(v.x + v.start.x, v.y + v.start.y, v.z + v.start.z) {}
 
 double dist1(Vector3D u, Point3D C) {
-    //std::cerr << "u1: " << u << endl;
-    //std::cerr << "C1: " << C << endl; 
+    std::cerr << "u1: " << u << std::endl;
+    std::cerr << "C1: " << C << std::endl; 
     Vector3D w(u.start, C);
-    //std::cerr << "w1: " << w << endl;
+    std::cerr << "w1: " << w << std::endl;
     Point3D M = C, N;
     if (u.cosPhi(w) > 0) {
         N = u * std::min(1.0, (1/u.norm()) * w.norm() * u.cosPhi(w));
     } else {
-        //std::cerr << "N = u.start" << endl; 
+        std::cerr << "N = u.start" << std::endl; 
         N = u.start;
     }
-    //std::cerr << "M: " << M << std::endl;
-    //std::cerr << "N: " << N << std::endl;
+    std::cerr << "M: " << M << std::endl;
+    std::cerr << "N: " << N << std::endl;
+    std::cerr << "d(MN) = " << Vector3D(M, N).norm() << std::endl;
+
     return Vector3D(M, N).norm();
 }
 
@@ -119,9 +121,9 @@ double dist(Vector3D u, Vector3D v) {
 
     Vector3D w(u.start, v.start);
 
-    //std::cerr << "u: " << u << endl;
-    //std::cerr << "v: " << v << endl;
-    //std::cerr << "w: " << w << endl;
+    std::cerr << "u: " << u << std::endl;
+    std::cerr << "v: " << v << std::endl;
+    std::cerr << "w: " << w << std::endl;
 
     if (u.isCollinear(v)) {
         std::cerr << "AB collinear to CD" << std::endl;
@@ -131,14 +133,6 @@ double dist(Vector3D u, Vector3D v) {
             std::min(dist1(v, u.start), dist1(v, u))
         );
         
-        /*
-        M = v.start;
-        if (u.cosPhi(w) >= 0) {
-            N = u * (1/u.norm()) * w.norm() * u.cosPhi(w);
-        } else {
-            N = u.start;
-        }
-        */
     } else if (u.isCoplanar(v)) {
         std::cerr << "AB coplanar to CD" << std::endl;
         double Det1 = -u.x * v.y + v.x * u.y;
@@ -146,7 +140,7 @@ double dist(Vector3D u, Vector3D v) {
         double Det3 = -u.y * v.z + v.y * u.z;
         double Deta = 0, Detb = 0, a, b;
 
-        //std::cerr << " " << Det1 << " " << Det2 << " " << Det3 << std::endl;
+        std::cerr << " " << Det1 << " " << Det2 << " " << Det3 << std::endl;
 
         if (abs(Det1) > DBL_EPSILON) {
             Deta = -w.x * v.y + w.y * v.x;
@@ -165,7 +159,7 @@ double dist(Vector3D u, Vector3D v) {
             b = Detb / Det3;
         }
 
-        //std::cerr << "a, b = "<< a << ", " << b << endl;
+        std::cerr << "a, b = "<< a << ", " << b << std::endl;
 
         Vector3D au = u * a;
         Vector3D bv = v * b;
@@ -173,34 +167,34 @@ double dist(Vector3D u, Vector3D v) {
 
         Point3D P1, P2, P, E, O = au;
         if (a <= DBL_EPSILON) {
-            //std::cerr << "Point A" << std::endl;
+            std::cerr << "Point A" << std::endl;
             M = A;
             P1 = B;
         } else if (a < 1) {
-            //std::cerr << "Point M" << std::endl;
+            std::cerr << "Point M" << std::endl;
             M = au;
             P1 = A;
         } else {
-            //std::cerr << "Point B" << std::endl;
+            std::cerr << "Point B" << std::endl;
             M = B;
             P1 = A;
         }
 
         if (b <= DBL_EPSILON) {
-            //std::cerr << "Point C" << std::endl;
+            std::cerr << "Point C" << std::endl;
             N = C;
             P2 = D;
         } else if (b < 1) {
-            //std::cerr << "Point N" << std::endl;
+            std::cerr << "Point N" << std::endl;
             N = bv;
             P2 = C;
         } else {
-            //std::cerr << "Point D" << std::endl;
+            std::cerr << "Point D" << std::endl;
             N = D;
             P2 = C;
         }
-        //std::cerr << "M: " << M << std::endl;
-        //std::cerr << "N: " << N << std::endl;
+        std::cerr << "M: " << M << std::endl;
+        std::cerr << "N: " << N << std::endl;
 
         if (Vector3D(M, O).norm() < Vector3D(N, O).norm()) {
             std::swap(M, N);
@@ -208,16 +202,15 @@ double dist(Vector3D u, Vector3D v) {
         } else {
             P = P2;
         }
-
-        double cos_phi = abs(u * v / (sqrt(u * u)*sqrt(v * v)));
-        double sin_phi = sqrt(1 - cos_phi * cos_phi);
+        
+        std::cerr << "M: " << M << std::endl;
+        std::cerr << "N: " << N << std::endl;
 
         Vector3D MO(M, O);
-        Vector3D PN(P, N);
         Vector3D OP(O, P);
         Vector3D ON(O, N);
 
-        Vector3D OE = OP * (1/OP.norm()) * MO.norm() * cos_phi;
+        Vector3D OE = OP * (1/OP.norm()) * MO.norm() * u.cosPhi(v);
 
         if (OE.norm() > OP.norm()) {
             N = P;    
@@ -225,14 +218,25 @@ double dist(Vector3D u, Vector3D v) {
             N = Point3D(OE);
         }
 
-        //std::cerr << "A: " << A << std::endl;
-        //std::cerr << "B: " << B << std::endl;
-        //std::cerr << "C: " << C << std::endl;
-        //std::cerr << "D: " << D << std::endl;
-        //std::cerr << "P: " << P << std::endl;
-        //std::cerr << "M: " << M << std::endl;
-        //std::cerr << "N: " << N << std::endl;
+        Vector3D PN(P, N);
 
+        std::cerr << "M: " << M << std::endl;
+        std::cerr << "N: " << N << std::endl;
+  
+
+        std::cerr << "A: " << A << std::endl;
+        std::cerr << "B: " << B << std::endl;
+        std::cerr << "C: " << C << std::endl;
+        std::cerr << "D: " << D << std::endl;
+        std::cerr << "P: " << P << std::endl;
+        std::cerr << "M: " << M << std::endl;
+        std::cerr << "N: " << N << std::endl;
+        std::cerr << "PN: " << PN << std::endl;
+        std::cerr << "MH: " << Vector3D(PN.x, PN.y, PN.z, M) << std::endl; 
+        double d1 = dist(PN, Vector3D(PN.x, PN.y, PN.z, M));
+        
+        std::cerr << "d1 = " << d1 << std::endl;
+        //return d1;
         
     } else {
         std::cerr << "AB not coplanar to CD" << std::endl;
@@ -246,87 +250,87 @@ double dist(Vector3D u, Vector3D v) {
         double a = (-wu * v2 + wv * uv) / (uv * uv - u2 * v2);
         double b = (u2 * wv - wu * uv) / (uv * uv - u2 * v2);
 
-        //std::cerr << "cos(phi) = " << uv / (sqrt(u2)*sqrt(v2)) << std::endl;
+        std::cerr << "cos(phi) = " << uv / (sqrt(u2)*sqrt(v2)) << std::endl;
 
-        //std::cerr << "(wu) = " << (wu) << endl;
-        //std::cerr << "(wv) = " << (wv) << endl;
-        //std::cerr << "(uv - u2) = " << (uv - u2) << endl;
-        //std::cerr << "(uv - v2) = " << (uv - v2) << endl;
-        //std::cerr << "(uv*uv - u2*v2) = " << (uv*uv - u2*v2) << endl;
+        std::cerr << "(wu) = " << (wu) << std::endl;
+        std::cerr << "(wv) = " << (wv) << std::endl;
+        std::cerr << "(uv - u2) = " << (uv - u2) << std::endl;
+        std::cerr << "(uv - v2) = " << (uv - v2) << std::endl;
+        std::cerr << "(uv*uv - u2*v2) = " << (uv*uv - u2*v2) << std::endl;
 
-        //std::cerr << u2 << " " << -uv << std::endl;
-        //std::cerr << uv << " " << -v2 << std::endl;
-        //std::cerr << wu << std::endl;
-        //std::cerr << wv << std::endl;
+        std::cerr << u2 << " " << -uv << std::endl;
+        std::cerr << uv << " " << -v2 << std::endl;
+        std::cerr << wu << std::endl;
+        std::cerr << wv << std::endl;
 
             
         
 
-        //std::cerr << "a, b = "<< a << ", " << b << endl;
+        std::cerr << "a, b = "<< a << ", " << b << std::endl;
        
 
         Vector3D au = u*a;
         Vector3D bv = v*b;
 
-        //std::cerr << "au: " << au << endl;
-        //std::cerr << "bv: " << bv << endl;
+        std::cerr << "au: " << au << std::endl;
+        std::cerr << "bv: " << bv << std::endl;
         M = au;
         N = bv;
 
         if ((0 <= a && a <= 1) && !(0 <=b && b <= 1)) {
-            //std::cerr << "M: Point au" << std::endl;
+            std::cerr << "M: Point au" << std::endl;
 
             if (b <= DBL_EPSILON) {
-                //std::cerr << "N: Point C" << std::endl;
+                std::cerr << "N: Point C" << std::endl;
                 N = C;
             } else if (b > 1) {
-                //std::cerr << "N: Point D" << std::endl;
+                std::cerr << "N: Point D" << std::endl;
                 N = D;
             }
             return dist1(u, N);
             
         } else if (!(0 <= a && a <= 1) && (0 <= b && b <= 1)) {
-            //std::cerr << "N: Point bv" << std::endl;
+            std::cerr << "N: Point bv" << std::endl;
             
             if (a <= DBL_EPSILON) {
-                //std::cerr << "M: Point A" << std::endl;
+                std::cerr << "M: Point A" << std::endl;
                 M = A;
             } else if (a > 1) {
-                //std::cerr << "M: Point B" << std::endl;
+                std::cerr << "M: Point B" << std::endl;
                 M = B;
             }
             return dist1(v, M);
         } else if (a < 0 && b < 0) {
             if (Vector3D(M, A).norm() < Vector3D(N, C).norm()) {
-                //std::cerr << "a < 0, b < 0, MA < NC" << endl;
+                std::cerr << "a < 0, b < 0, MA < NC" << std::endl;
                 return dist1(u, C); 
             } else {
-                //std::cerr << "a < 0, b < 0, MA >= NC: " << Vector3D(M, A).norm() << " >= " << Vector3D(N, C).norm() << endl;
+                std::cerr << "a < 0, b < 0, MA >= NC: " << Vector3D(M, A).norm() << " >= " << Vector3D(N, C).norm() << std::endl;
                 return dist1(v, A);
             }
         } else if (a > 1 && b > 1) {
             if (Vector3D(M, B).norm() < Vector3D(N, D).norm()) {
-                //std::cerr << "a > 1, b > 1, MB < ND" << endl;
+                std::cerr << "a > 1, b > 1, MB < ND" << std::endl;
                 return dist1(u, D); 
             } else {
-                //std::cerr << "a > 1, b > 1, MB >= ND: " << Vector3D(M, B).norm() << " >= " << Vector3D(N, D).norm() << endl;
+                std::cerr << "a > 1, b > 1, MB >= ND: " << Vector3D(M, B).norm() << " >= " << Vector3D(N, D).norm() << std::endl;
                 return dist1(v, B);
             }
 
         } else if (a < 0 && b > 1) {
             if (Vector3D(M, A).norm() < Vector3D(N, D).norm()) {
-                //std::cerr << "a < 0, b > 1, MA < ND" << endl;
+                std::cerr << "a < 0, b > 1, MA < ND" << std::endl;
                 return dist1(u, D); 
             } else {
-                //std::cerr << "a < 0, b > 1, MA >= ND: " << Vector3D(M, A).norm() << " >= " << Vector3D(N, D).norm() << endl;
+                std::cerr << "a < 0, b > 1, MA >= ND: " << Vector3D(M, A).norm() << " >= " << Vector3D(N, D).norm() << std::endl;
                 return dist1(v, A);
             }
         } else if (a > 1 && b < 0) {
             if (Vector3D(M, B).norm() < Vector3D(N, C).norm()) {
-                //std::cerr << "a > 1, b < 0, MB < NC" << endl;
+                std::cerr << "a > 1, b < 0, MB < NC" << std::endl;
                 return dist1(u, C); 
             } else {
-                //std::cerr << "a > 1, b < 0, MB >= NC: " << Vector3D(M, B).norm() << " >= " << Vector3D(N, C).norm() << endl;
+                std::cerr << "a > 1, b < 0, MB >= NC: " << Vector3D(M, B).norm() << " >= " << Vector3D(N, C).norm() << std::endl;
                 return dist1(v, B);
             }
         } else {
@@ -336,52 +340,52 @@ double dist(Vector3D u, Vector3D v) {
         assert(false);
 
         if (a <= DBL_EPSILON) {
-            //std::cerr << "Point A" << std::endl;
+            std::cerr << "Point A" << std::endl;
             M = A;
         } else if (a < 1) {
-            //std::cerr << "Point M" << std::endl;
+            std::cerr << "Point M" << std::endl;
             M = au;
         } else {
-            //std::cerr << "Point B" << std::endl;
+            std::cerr << "Point B" << std::endl;
             M = B;
             
         }
         double d1 = dist(v, Vector3D(v.x, v.y, v.z, M));
-        //std::cerr << "d1=" << d1 << endl;
+        std::cerr << "d1=" << d1 << std::endl;
 
         if (b <= DBL_EPSILON) {
-            //std::cerr << "Point C" << std::endl;
+            std::cerr << "Point C" << std::endl;
             N = C;
         } else if (b < 1) {
-            //std::cerr << "Point N" << std::endl;
+            std::cerr << "Point N" << std::endl;
             N = bv;
         } else {
-            //std::cerr << "Point D" << std::endl;
+            std::cerr << "Point D" << std::endl;
             N = D;
         }
         double d2 = dist(u, Vector3D(u.x, u.y, u.z, N));
-        //std::cerr << "d2=" << d2 << endl;
+        std::cerr << "d2=" << d2 << std::endl;
 
         Vector3D n(au, bv);
-        //std::cerr << "n: " << n << std::endl;
-        //std::cerr << "M1: " << Point3D(au) << std::endl;
-        //std::cerr << "N2: " << Point3D(bv) << std::endl;
-        //std::cerr << au + n << " == " << w + bv << std::endl;
+        std::cerr << "n: " << n << std::endl;
+        std::cerr << "M1: " << Point3D(au) << std::endl;
+        std::cerr << "N2: " << Point3D(bv) << std::endl;
+        std::cerr << au + n << " == " << w + bv << std::endl;
 
-        //std::cerr << "(n * u): " << n * u << std::endl;
-        //std::cerr << "(n * u) = w * u + b*uv - a*u2: " << w * u + b*uv - a*u2 << std::endl;
-        //std::cerr << "(n * v): " << n * v << std::endl;
+        std::cerr << "(n * u): " << n * u << std::endl;
+        std::cerr << "(n * u) = w * u + b*uv - a*u2: " << w * u + b*uv - a*u2 << std::endl;
+        std::cerr << "(n * v): " << n * v << std::endl;
 
-        //std::cerr << "(n * v) = w * v + b*v2 - a*uv: " << w * v + b*v2 - a*uv << std::endl;
+        std::cerr << "(n * v) = w * v + b*v2 - a*uv: " << w * v + b*v2 - a*uv << std::endl;
 
         
     }
 
     Vector3D n(M, N);
-    //std::cerr << "M: " << M << endl;
-    //std::cerr << "N: " << N << endl;    
-    //std::cerr << "MN: " << n << endl;
-    //std::cerr << "d(MN) = " << n.norm() << endl;
+    std::cerr << "M: " << M << std::endl;
+    std::cerr << "N: " << N << std::endl;    
+    std::cerr << "MN: " << n << std::endl;
+    std::cerr << "d(MN) = " << n.norm() << std::endl;
 
     return n.norm();
 }
