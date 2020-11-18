@@ -26,7 +26,7 @@ struct Point2D {
     Point2D(double x=0, double y=0) : x(x), y(y) {}
 
     bool operator<(const Point2D &p) const {
-        return x < p.x ? true : (y < p.y ? true : false);
+        return x < p.x ? true : false;
     }
 
     friend std::ostream& operator<<(std::ostream &out, const Point2D &v) {
@@ -40,6 +40,7 @@ struct Segment2D {
 
     Segment2D(const Point2D &start={0, 0}, const Point2D &end={0, 0}) : start(start), end(end) {
         if (end < start) {
+            //std::cerr << "Swap " << end << ' ' << start << std::endl; 
             std::swap(this->start, this->end);
         } 
     }
@@ -86,7 +87,7 @@ struct Segment2D {
 std::ostringstream message;
 
 int main() {
-    freopen("input.txt", "r", stdin);
+    //freopen("input.txt", "r", stdin);
     int n;
     bool found = false;
 
@@ -119,61 +120,82 @@ int main() {
         segments.push_back(Segment2D(p1, p2));
     }
 
-    std::cerr << "segments: " << std::endl;
-    std::cerr << segments << std::endl;
+    //std::cerr << "segments: " << std::endl;
+    //std::cerr << segments << std::endl;
 
     std::sort(x.begin(), x.end());
     auto last = std::unique(x.begin(), x.end());
     x.erase(last, x.end());
 
-    std::cerr << "x: " << std::endl;
-    std::cerr << x << std::endl;
+    //std::cerr << "x: " << std::endl;
+    //std::cerr << x << std::endl;
 
     std::vector<int> intersect;
-    std::copy(started[x[0]].begin(), started[x[0]].end(), std::back_inserter(intersect));
-    std::sort(intersect.begin(), intersect.end(), [segments](int i, int j) {
-        return segments[i].start.y < segments[j].start.y; 
-    });
     
-    for (int k = 1; k < x.size(); k++) {
-        std::cerr << "k = " << k << std::endl;
-        std::cerr << "intersect: " << std::endl;
-        std::cerr << intersect << std::endl;
-
-        for (int j = 0; j < intersect.size() - 1; j++) {
-            if (segments[intersect[j]].intersect(segments[intersect[j + 1]])) {
-                std::cerr << "Found: " << std::endl;
-                numbers = {intersect[j], intersect[j + 1]};
-                found = true;
-                break;
-            }
-        }
+    for (int k = 0; k < x.size(); k++) {
+        //std::cerr << "k = " << k << std::endl;
+        //std::cerr << "intersect: " << std::endl;
+        //std::cerr << intersect << std::endl;
 
         if (started[x[k]].size() > 0) {
             std::sort(started[x[k]].begin(), started[x[k]].end(), [segments](int i, int j) {
                 return segments[i].start.y < segments[j].start.y; 
             });
-            std::cerr << "Add segments started at " << x[k] << ": " << std::endl;
-            std::cerr << started[x[k]] << std::endl;
+            //std::cerr << "Add segments started at " << x[k] << ": " << std::endl;
+            //std::cerr << started[x[k]] << std::endl;
 
             auto iter1 = started[x[k]].begin();
-            auto iter2 = intersect.begin();
-
-            std::cerr << *iter1 << " " << *iter2 << std::endl;
+            auto pos = intersect.begin();
 
             while (iter1 != started[x[k]].end()) {
-                std::cerr << "*iter1 = " << *iter1 << std::endl;
-                while (iter2 != intersect.end() 
-                    && segments[*iter1].start.y >= segments[*iter2].intersectY1(segments[*iter1].start.x)) {
-                    std::cerr << "*iter2 = " << *iter2 << std::endl;
-                    iter2++;
-                }
+                //std::cerr << "*iter1 = " << *iter1 << std::endl;
+                ////std::cerr << "*pos = " << *pos << std::endl;
                 
-                if (iter2 != intersect.end()) {
-                    intersect.insert(iter2, *iter1);
+                if (pos != intersect.end()) {
+                    //std::cerr << "y1 >= y2: " << segments[*iter1].start.x << " " << segments[*iter1].start.y << " >=";
+                    //std::cerr << (segments[*pos].intersectY1(segments[*iter1].start.x)) << ": ";
+                    //std::cerr << (segments[*iter1].start.y >= segments[*pos].intersectY1(segments[*iter1].start.x)) << std::endl;
+                    while (pos != intersect.end() 
+                        && segments[*iter1].start.y >= segments[*pos].intersectY1(segments[*iter1].start.x)) {
+                        //std::cerr << "*pos = " << *pos << std::endl;
+                        pos++;
+                    }
+                }
+
+                auto next = pos != intersect.end() ? pos + 1 : pos;
+                auto prev = pos != intersect.begin() ? pos - 1 : intersect.end();
+
+                if (next != intersect.end() && segments[*next].intersect(segments[*iter1])) {
+                    //std::cerr << "Found next: " << std::endl;
+                    numbers = {*next, *iter1};
+                    found = true;
+                    break;    
+                }
+
+                if (prev != intersect.end() && segments[*prev].intersect(segments[*iter1])) {
+                    //std::cerr << "Found prev: " << std::endl;
+                    numbers = {*prev, *iter1};
+                    found = true;
+                    break;    
+                }
+
+                //std::cerr << "After adding " << *iter1 << " before ";
+                //std::cerr << ((pos != intersect.end()) ? (*pos) : -1) << ":" << std::endl;
+                if (pos != intersect.end()) {
+                    pos = intersect.insert(pos, *iter1);
+                    //std::cerr << "pos != end()" << std::endl;
+                    //std::cerr << *pos << std::endl;
+                    pos++;
+                    //std::cerr << *pos << std::endl;
                 } else {
                     intersect.push_back(*iter1);
+                    //std::cerr << "pos == end()" << std::endl;
+                    pos = intersect.end();
                 }
+                
+                //std::cerr << intersect << std::endl;
+                //std::cerr << "end = " << !(pos != intersect.end()) << std::endl;
+                
                 iter1++;
             }
             /*
@@ -184,21 +206,41 @@ int main() {
             */
         }
 
-        if (ended[x[k-1]].size() > 0) {
-            std::cerr << "Remove segments ended at " << x[k-1] << ": " << std::endl;
-            std::cerr << ended[x[k-1]] << std::endl;
-            for (int i : ended[x[k-1]]) {
+        if (ended[x[k]].size() > 0) {
+            //std::cerr << "Remove segments ended at " << x[k] << ": " << std::endl;
+            //std::cerr << ended[x[k]] << std::endl;
+            for (int i : ended[x[k]]) {
                 auto pos = std::find(intersect.begin(), intersect.end(), i);
                 int prev_i, next_i;
-                if (pos != intersect.begin() && pos != intersect.end()) {
+                if (pos != intersect.begin() && pos+1 != intersect.end()) {
                     prev_i = *(pos - 1);
                     next_i = *(pos + 1);
                     if (segments[prev_i].intersect(segments[next_i])) {
-                        std::cerr << "Found: " << std::endl;
+                        //std::cerr << "Found 1: " << std::endl;
                         found = true;
                         numbers = {prev_i, next_i};
                         break;
                     }
+                } else if (pos == intersect.begin() && pos+1 != intersect.end()) {
+                    prev_i = *(pos);
+                    next_i = *(pos + 1);
+                    if (segments[prev_i].intersect(segments[next_i])) {
+                        //std::cerr << "Found 2: " << std::endl;
+                        found = true;
+                        numbers = {prev_i, next_i};
+                        break;
+                    }
+
+                } else if (pos != intersect.begin() && pos+1 == intersect.end()) {
+                    prev_i = *(pos - 1);
+                    next_i = *(pos);
+                    if (segments[prev_i].intersect(segments[next_i])) {
+                        //std::cerr << "Found 3: " << std::endl;
+                        found = true;
+                        numbers = {prev_i, next_i};
+                        break;
+                    }
+
                 }
                 intersect.erase(pos);
             }
@@ -207,14 +249,14 @@ int main() {
         if (found) break;
     }
 
-    std::cerr << message.str() << std::endl;
+    //std::cerr << message.str() << std::endl;
 
     if (found) {
         std::cout << "YES" << std::endl;
         if (numbers.first < numbers.second) {
             std::cout << numbers.first + 1 << " " << numbers.second + 1 << std::endl;
         } else {
-            std::cout << numbers.second + 1<< " " << numbers.first + 1<< std::endl;
+            std::cout << numbers.second + 1 << " " << numbers.first + 1<< std::endl;
         }
     } else {
         std::cout << "NO" << std::endl;
