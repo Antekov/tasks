@@ -11,15 +11,15 @@
 using namespace std;
 
 struct Point {
-    long long x = 0, y = 0;
-    Point(long long x = 0, long long y = 0) : x(x), y(y) {}
-    Point(const pair<long long, long long> p) : x(p.first), y(p.second) {}
+    double x = 0, y = 0;
+    Point(double x = 0, double y = 0) : x(x), y(y) {}
+    Point(const pair<double, double> p) : x(p.first), y(p.second) {}
     double phi(const Point &p) const {
         Point a = (p - *this);
         return atan2(a.y, a.x);
     }
     bool operator<(const Point &p) const {
-        return pair<long long, long long>{x, y} < pair<long long, long long>{p.x, p.y};
+        return pair<double, double>{x, y} < pair<double, double>{p.x, p.y};
     }
     double dist2(const Point &p) const {
         return (x - p.x)*(x - p.x) + (y - p.y)*(y - p.y);
@@ -30,7 +30,7 @@ struct Point {
     Point operator+(const Point &p) const {
         return Point(x + p.x, y + p.y);
     }
-    long long operator*(const Point &p) const {
+    double operator*(const Point &p) const {
         return x * p.y - y * p.x;
     }
 
@@ -129,6 +129,24 @@ double getY(Point a, Point b) {
     return a.y - k * a.x;
 }
 
+double getX(Point a, Point b) {
+    //std::cerr << "getX(" << a << ", " << b << ")" << endl;
+
+    if (fabs(a.x - b.x) < DBL_EPSILON) {
+        return a.x;
+    }
+    if (fabs(a.y - b.y) < DBL_EPSILON) {
+        if (fabs(a.y) < DBL_EPSILON && a.x * b.x < 0) {
+            return (a.x + b.x) / 2;
+        } else {
+            return INF;
+        }
+    }
+    double k = (b.y - a.y) / (b.x - a.x);
+    double c = a.y - k * a.x;
+    return -c / k;
+}
+
 bool insideTriangle(Point a, Point b, Point c) {
     //std::cerr << "InsideTriangle: " << a << b << c << endl;
     double yc, ya, yb;
@@ -163,7 +181,8 @@ bool insideTriangle(Point a, Point b, Point c) {
 int main() {
     //freopen("input.txt", "r", stdin);
     vector<Point> Q;
-    long long n, x, y;
+    long long n;
+    double x, y;
     cin >> n;
     for(long long i = 0; i < n; i++) {
         cin >> x >> y;
@@ -171,7 +190,8 @@ int main() {
     }
 
     vector<Point> S;
-    long long m, x1, y1;
+    long long m;
+    double x1, y1;
     cin >> m;
     for(long long j = 0; j < m; j++) {
         cin >> x1 >> y1;
@@ -226,17 +246,26 @@ int main() {
     bool inside = false;
 
     
-
+    ans.push_back(ans[0]);
     //std::cerr << ans << endl;
 
-    for (int i = 1; i < ans.size() - 1; i++) {
-        if (insideTriangle(ans[0], ans[i+1], ans[i])) {
-            inside = true;
-            break;
+    int count = 0;
+    double x0 = INF;
+    for (int i = 0; i < ans.size() - 1; i++) {
+        Point a = ans[i], b = ans[i+1];
+
+        if (a.y * b.y <= 0 && !(x == a.x && 0 == a.y)) {
+            x0 = getX(a, b);
+            if (x0 > 0 && x0 < INF) {
+                //std::cerr << "x[" << i << "] = " << x0 << std::endl;
+                count++;
+            }
         }
     }
 
-    
+    inside = (count % 2 == 1);
+
+
 
 
     /*
