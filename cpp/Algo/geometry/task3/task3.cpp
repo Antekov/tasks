@@ -120,29 +120,46 @@ struct Facet {
     void sort() {
         cerr << "Sort " << *this << endl;
 
-        
+        if (p2.id < p1.id && p2.id < p3.id) {
+            cerr << "Var 1" << endl;
+            swap(p2, p1);
+            double cw = Vector(p1, p2).isClockwise(Vector(p3, p2));
 
-        double cw = Vector(p1, p2).isClockwise(Vector(p1, p3));
-        cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
-        if (cw) {
-            cerr << "Swap!" << endl;
-            std::swap(p2, p3);
+            cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p2, p3) << ": " << cw << endl;
+            if (cw && cosPhi() > 0 || !cw && cosPhi() < 0) {
+                cerr << "Swap!" << endl;
+                std::swap(p2, p3);
 
-            cw = Vector(p1, p2).isClockwise(Vector(p1, p3));
-            cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
+                cw = Vector(p1, p2).isClockwise(Vector(p3, p2));
+                cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
+            }
+        } else if (p3.id < p1.id) {
+            cerr << "Var 2" << endl;
+            swap(p3, p2);
+            swap(p2, p1);
+            double cw = Vector(p1, p2).isClockwise(Vector(p2, p3));
+
+            cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p2, p3) << ": " << cw << endl;
+            if (cw && cosPhi() > 0 || !cw && cosPhi() < 0) {
+                cerr << "Swap!" << endl;
+                std::swap(p2, p3);
+
+                cw = Vector(p1, p2).isClockwise(Vector(p3, p2));
+                cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
+            }
+            
+        } else {
+            cerr << "Var 3" << endl;
+            double cw = Vector(p1, p2).isClockwise(Vector(p3, p2));
+            cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p2, p3) << ": " << cw << endl;
+            if (cw && cosPhi() < 0 || !cw && cosPhi() > 0) {
+                cerr << "Swap!" << endl;
+                std::swap(p2, p3);
+
+                cw = Vector(p1, p2).isClockwise(Vector(p3, p3));
+                cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
+            }
         }
-
-        
-
-        
-
-        cw = Vector(p2, p3).isClockwise(Vector(p2, p1));
-        cerr << "Is cloclwise: " << Vector(p2, p3) << " and " << Vector(p2, p1) << ": " << cw << endl;
-        
-        cw = Vector(p3, p1).isClockwise(Vector(p3, p2));
-        cerr << "Is cloclwise: " << Vector(p2, p3) << " and " << Vector(p2, p1) << ": " << cw << endl;
-
-
         
         cerr << *this << endl;
     }
@@ -354,10 +371,19 @@ int main() {
     cout << facets.size() << endl;
 
     for (int i = 0; i < facets.size(); i++) {
-        //facets[i].sort();
+        facets[i].sort();
+        //cout << facets[i] << endl;
+        
+    }
+
+    sort(facets.begin(), facets.end(), [](const Facet& a, const Facet& b) {
+        return pair<int, int>{a.p1.id, a.p2.id} < pair<int, int>{b.p1.id, b.p2.id};
+    });
+    cerr << "After sort: " << endl;
+    for (int i = 0; i < facets.size(); i++) {
+        
         cout << facets[i] << endl;
     }
-    cerr << "After sort: " << endl;
 
 
     return 0;
