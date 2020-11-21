@@ -89,10 +89,23 @@ struct Facet {
     Point p1, p2, p3;
 
     Facet() {}
-    Facet(const Point& p1, const Point& p2, const Point& p3) : p1(p1), p2(p2), p3(p3) {}
+    Facet(const Point& p1, const Point& p2, const Point& p3) : p1(p1), p2(p2), p3(p3) {
+        //sort();
+    }
 
     Vector n() {
-        return Vector(p1, p2) ^ Vector(p1, p3);
+        return Vector(p1, p2) ^ Vector(p2, p3);
+    }
+
+    bool operator==(const Facet &e) const {
+        set<int> s;
+        s.insert(p1.id);
+        s.insert(p2.id);
+        s.insert(p3.id);
+        s.erase(e.p1.id);
+        s.erase(e.p2.id);
+        s.erase(e.p3.id);
+        return s.empty();
     }
 
     double cosPhi(const Vector& v = Vector(0, 0, 1)) {
@@ -106,38 +119,71 @@ struct Facet {
 
     void sort() {
         cerr << "Sort " << *this << endl;
-        vector<Point> p(3);
-        if (p1.id < p2.id && p1.id < p3.id) {
-            cerr << "Var 1" << endl;
-            p[0] = p1; p[1] = p2; p[2] = p3;
-        } else if (p2.id < p1.id && p2.id < p3.id) {
-            cerr << "Var 2" << endl;
-            p[0] = p2; p[1] = p1; p[2] = p3;
-        } else if (p3.id < p2.id && p3.id < p1.id) {
-            cerr << "Var 3" << endl;
-            p[0] = p3; p[1] = p2; p[2] = p1;
-        } else {
-            cerr << "Var -1" << endl;
-        }
-        
-        bool cw = Vector(p1, p2).isClockwise(Vector(p1, p3));
-        cerr << "Is cloclwise: " << Vector(p[0], p[1]) << " and " << Vector(p[0], p[2]) << ": " << cw << endl;
-        if (cw) {
-            std::swap(p[1], p[2]);
-        }
-        p1 = p[0];
-        p2 = p[1];
-        p3 = p[2];
 
+        
+
+        double cw = Vector(p1, p2).isClockwise(Vector(p1, p3));
+        cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
+        if (cw) {
+            cerr << "Swap!" << endl;
+            std::swap(p2, p3);
+
+            cw = Vector(p1, p2).isClockwise(Vector(p1, p3));
+            cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
+        }
+
+        
+
+        
+
+        cw = Vector(p2, p3).isClockwise(Vector(p2, p1));
+        cerr << "Is cloclwise: " << Vector(p2, p3) << " and " << Vector(p2, p1) << ": " << cw << endl;
+        
+        cw = Vector(p3, p1).isClockwise(Vector(p3, p2));
+        cerr << "Is cloclwise: " << Vector(p2, p3) << " and " << Vector(p2, p1) << ": " << cw << endl;
+
+
+        
         cerr << *this << endl;
     }
 };
 
 struct Edge {
-    Point p1, p2;
+    Point p1, p2, p3;
+
+    Edge() = default;
+    Edge(const Point &p1, const Point &p2, const Point &p3) : p1(p1), p2(p2), p3(p3) {
+        //sort();
+    }
+
+    void sort() {
+        cerr << "Sort " << *this << endl;
+
+        
+
+        double cw = Vector(p3, p1).isClockwise(Vector(p3, p2));
+        cerr << "Is cloclwise: " << Vector(p3, p1) << " and " << Vector(p3, p2) << ": " << cw << endl;
+        if (cw) {
+            cerr << "Swap!" << endl;
+            std::swap(p1, p2);
+
+        }
+
+        
+        cerr << *this << endl;
+    }
+
+    bool operator==(const Edge &e) const {
+        set<int> s;
+        s.insert(p1.id);
+        s.insert(p2.id);
+        s.erase(e.p1.id);
+        s.erase(e.p2.id);
+        return s.empty() && p3.id == e.p3.id;
+    }
 
     friend ostream& operator<<(ostream& out, const Edge& e) {
-        out << "Edge(" << e.p1 << ", " << e.p2 << ")";
+        out << "Edge(" << e.p1.id << ", " << e.p2.id << " : " << e.p3.id << ")";
         return out;
     }
 };
@@ -180,18 +226,21 @@ vector<Facet> solve(vector<Point> &points) {
 
     cerr << points << endl;
 
-    sort(points.begin(), points.end());
+    sort(points.begin(), points.end(), [](const Point &a, const Point &b) {
+        return (a.z < b.z ? true : false);
+    });
 
     cerr << points << endl;
     
     Point &p0 = points[0];
+    S.push_back(points[0]);
         
     double min_cos = 1;
     int min_i = 0;
     for (int i = 1; i < n; i++) {
         S.push_back(points[i]);
         
-        double cur_cos = Vector(p0, points[i]).cosPhi(Vector(p0.x, p0.y, p0.z+1));
+        double cur_cos = Vector(p0, points[i]).cosPhi(Vector(0, 0, 1));
         cerr << "Cos(" << points[i] << ") = " << cur_cos << endl; 
         if (cur_cos < min_cos) {
             min_cos = cur_cos;
@@ -201,8 +250,7 @@ vector<Facet> solve(vector<Point> &points) {
     cerr << "S0: " << endl << S << endl;
     cerr << min_i << endl;
 
-    S.erase(find(S.begin(), S.end(), points[min_i]));
-
+    
     min_cos = 1;
     int min_j = 0;
     for (int j = 1; j < n; j++) {
@@ -210,7 +258,7 @@ vector<Facet> solve(vector<Point> &points) {
 
         Facet f(p0, points[min_i], points[j]);
 
-        double cur_cos = Vector(p0, points[j]).cosPhi(Vector(p0.x, p0.y, p0.z+1));
+        double cur_cos = Vector(p0, points[j]).cosPhi(Vector(0, 0, 1));
         cerr << "Cos(" << f << ", n=" << f.n() << ") = " << cur_cos << endl; 
         if (cur_cos < min_cos) {
             min_cos = cur_cos;
@@ -220,54 +268,69 @@ vector<Facet> solve(vector<Point> &points) {
 
     cerr << min_j << endl;
 
-    S.erase(find(S.begin(), S.end(), points[min_j]));
-
     facets.insert(facets.begin(), Facet(p0, points[min_i], points[min_j]));
-    facets[0].sort();
-
+    
     cerr << facets[0] << endl;
 
-    edges.push_back({facets[0].p3, facets[0].p1});
-    edges.push_back({facets[0].p2, facets[0].p3});
-    edges.push_back({facets[0].p1, facets[0].p2});
+    edges.push_back({facets[0].p3, facets[0].p1, facets[0].p2});
+    edges.push_back({facets[0].p2, facets[0].p3, facets[0].p1});
+    edges.push_back({facets[0].p1, facets[0].p2, facets[0].p3});
         
+    bool is_new_edges = true;
+    while (is_new_edges && !edges.empty() && !S.empty()) {
+        is_new_edges = false;
+        cerr << "Edges: " << endl;
+        cerr << edges << endl;
 
-    while (!edges.empty()) {
-        Edge e = edges[edges.size() - 1];
+        
+        
+            Edge e = edges[0];
+            Vector n = Facet(e.p1, e.p2, e.p3).n();
 
-        cerr << e << endl;
-        Point p1, p2;
+            cerr << "Last edge: " << e << endl;
+            Point p1, p2;
 
-        p1 = e.p1;
-        p2 = e.p2;
+            p1 = e.p1;
+            p2 = e.p2;
 
-        Vector n = facets.front().n();
-        double min_cos = 1;
-        Point min_p;
-        cerr << "S: " << endl << S << endl;
-        for (auto p3 : S) {
-            cerr << "p3 = " << p3 << endl;
-            Vector Vn = Facet(p3, p2, p1).n();
+            
+            double min_cos = 1;
+            Point min_p;
+            cerr << "S: " << endl << S << endl;
+            for (auto p : S) {
+                cerr << "p = " << p << endl;
+                Vector Vn = Facet(p, p1, p2).n();
 
-            double cur_cos = n.cosPhi(Vn);
-            if (cur_cos < min_cos) {
-                min_cos = cur_cos;
-                min_p = p3;
+                double cur_cos = n.cosPhi(Vn);
+                cerr << "Cos(" << Vn << ", " << n << ") = " << cur_cos << endl;
+                if (cur_cos < min_cos) {
+                    min_cos = cur_cos;
+                    min_p = p;
+                }
             }
-        }
+            edges.erase(edges.begin());
 
-        facets.insert(facets.begin(), Facet(min_p, p2, p1));
-        // facets[0].sort();
-        cerr << min_p << facets[0] << endl;
-        
-        cerr << "Need erase from S: " << endl << e.p1 << endl << e.p2 << endl; 
-        if (find(S.begin(), S.end(), e.p1) != S.end()) {
-            S.erase(find(S.begin(), S.end(), e.p1));
-        }
-        if (find(S.begin(), S.end(), e.p2) != S.end()) {
-            S.erase(find(S.begin(), S.end(), e.p2));
-        }
-        edges.pop_back();
+
+            if (find(facets.begin(), facets.end(), Facet{min_p, p2, p1}) == facets.end()) {
+                facets.insert(facets.begin(), Facet(min_p, p2, p1));
+                cerr << "Found new Facet: " << min_p << facets[0] << endl;
+                if (find(edges.begin(), edges.end(), Edge{min_p, p2, p1}) == edges.end()) {
+                    edges.push_back({min_p, p2, p1});
+                    is_new_edges = true;
+                }
+
+                if (find(edges.begin(), edges.end(), Edge{p1, min_p, p2}) == edges.end()) {
+                    edges.push_back({p1, min_p, p2});
+                    is_new_edges = true;
+                }
+            } else {
+                cerr << "Found old Facet: " << min_p << Facet(min_p, p2, p1) << endl;
+                if (find(S.begin(), S.end(), min_p) != S.end()) {
+                    //S.erase(find(S.begin(), S.end(), min_p));
+                    is_new_edges = true;
+                }
+            }
+            
     }
 
     
@@ -291,19 +354,11 @@ int main() {
     cout << facets.size() << endl;
 
     for (int i = 0; i < facets.size(); i++) {
-        
+        //facets[i].sort();
         cout << facets[i] << endl;
     }
     cerr << "After sort: " << endl;
 
-    sort(facets.begin(), facets.end(), [](const Facet &a, const Facet &b) {
-        return a.p1.id < b.p1.id ? true : (a.p2.id < b.p2.id ? true : a.p3.id < b.p3.id);
-    });
-
-    for (int i = 0; i < facets.size(); i++) {
-        facets[i].sort();
-        cout << facets[i] << endl;
-    }
 
     return 0;
 }
