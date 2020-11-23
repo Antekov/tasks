@@ -26,7 +26,7 @@ struct Point {
     }
 
     friend ostream& operator<<(ostream& out, const Point& p) {
-        out << "Point "<< p.id << " (" << p.x << ", " << p.y << ", " << p.z << ")";
+        out << "Point "<< p.id << " (" << p.x << ", " << p.y << ", " << p.z << ") ";
         return out;
     }
 };
@@ -66,7 +66,7 @@ struct Vector {
     }
 
     Vector operator^(const Vector &v) const {
-        return Vector(y*v.z - z*v.y, x*v.z - z*v.x, x*v.y - y*v.x);
+        return Vector(y*v.z - z*v.y, -x*v.z + z*v.x, x*v.y - y*v.x);
     }
 
     bool isClockwise(const Vector &v) const {
@@ -113,55 +113,87 @@ struct Facet {
     }
 
     friend ostream& operator<<(ostream& out, const Facet& f) {
-        out << "3 " << f.p1.id << " " << f.p2.id << " " << f.p3.id;
+        out << "3 " << f.p1.id << " " << f.p2.id << " " << f.p3.id << " ";
         return out;
     }
 
-    void sort() {
-        cerr << "Sort " << *this << endl;
+    void sort(const Point &center) {
+        //cerr << "Sort " << *this << endl;
+        //cerr << p1 << p2 << p3 << endl;
+    
+        //cerr << "n = " << n() << endl;
 
-        if (p2.id < p1.id && p2.id < p3.id) {
-            cerr << "Var 1" << endl;
-            swap(p2, p1);
-            double cw = Vector(p1, p2).isClockwise(Vector(p3, p2));
+        vector<Point> p = {p1, p2, p3};
+        Vector g = Vector(center, p1) + Vector(center, p2) + Vector(center, p3);
 
-            cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p2, p3) << ": " << cw << endl;
-            if (cw && cosPhi() > 0 || !cw && cosPhi() < 0) {
-                cerr << "Swap!" << endl;
-                std::swap(p2, p3);
+        auto min_id = (*min_element(p.begin(), p.end(), [](const Point& a, const Point& b) { return a.id < b.id; })).id;
 
-                cw = Vector(p1, p2).isClockwise(Vector(p3, p2));
-                cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
-            }
-        } else if (p3.id < p1.id) {
-            cerr << "Var 2" << endl;
-            swap(p3, p2);
-            swap(p2, p1);
-            double cw = Vector(p1, p2).isClockwise(Vector(p2, p3));
-
-            cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p2, p3) << ": " << cw << endl;
-            if (cw && cosPhi() > 0 || !cw && cosPhi() < 0) {
-                cerr << "Swap!" << endl;
-                std::swap(p2, p3);
-
-                cw = Vector(p1, p2).isClockwise(Vector(p3, p2));
-                cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
-            }
-            
-        } else {
-            cerr << "Var 3" << endl;
-            double cw = Vector(p1, p2).isClockwise(Vector(p3, p2));
-            cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p2, p3) << ": " << cw << endl;
-            if (cw && cosPhi() < 0 || !cw && cosPhi() > 0) {
-                cerr << "Swap!" << endl;
-                std::swap(p2, p3);
-
-                cw = Vector(p1, p2).isClockwise(Vector(p3, p3));
-                cerr << "Is cloclwise: " << Vector(p1, p2) << " and " << Vector(p1, p3) << ": " << cw << endl;
-            }
+        int i = 0;
+        for (; i < p.size() && p[i].id != min_id; i++) {
+            Vector a = Vector(p[i], p[(i+1) % 3]);
+            Vector b = Vector(p[(i+1) % 3], p[(i+2) % 3]);
+            Vector c = Vector(p[i], p[(i+2) % 3]);
+            //cerr << i + 1 << ": " << a << "^ " << b << " = " << (a ^ b) << endl;
         }
+
+        //cerr << "Started from min:" << endl; 
+        //cerr << p[i] << p[(i+1) % 3] << p[(i+2) % 3] << endl;
+
+        Vector a = Vector(p[i], p[(i+1) % 3]);
+        Vector b = Vector(p[(i+1) % 3], p[(i+2) % 3]);
+        Vector c = Vector(p[i], p[(i+2) % 3]);
+
+        ////cerr << "AB x BC" << ": " << a << "^ " << b << " = " << (a ^ b) << endl;
+        ////cerr << "AB x AC" << ": " << a << "^ " << c << " = " << (a ^ c) << endl;
+
+        bool cw = a.isClockwise(b);
+        double cphi = n().cosPhi(g);
+
+        //cerr << "Is cloclwise: " << cw << endl;
+        //cerr << "Cos Phi: " << cphi << endl;
+
+        if (cw == 0 && cphi < 0) {
+            //cerr << "Var 1, swap" << endl;
+            std::swap(p[(i+1) % 3], p[(i+2) % 3]);
+        }
+
+        if (cw == 0 && cphi > 0) {
+            //cerr << "Var 2, not swap" << endl;
+            //std::swap(p[(i+1) % 3], p[(i+2) % 3]);
+        }
+
+        if (cw == 1 && cphi < 0) {
+            //cerr << "Var 3, swap" << endl;
+            std::swap(p[(i+1) % 3], p[(i+2) % 3]);
+        } 
+
+        if (cw == 1 && cphi > 0) {
+            //cerr << "Var 4, swap" << endl;
+            //std::swap(p[(i+1) % 3], p[(i+2) % 3]);
+        }
+
+        a = Vector(p[i], p[(i+1) % 3]);
+        b = Vector(p[(i+1) % 3], p[(i+2) % 3]);
+
+        //cerr << "After try swap:" << endl; 
+        //cerr << p[i] << p[(i+1) % 3] << p[(i+2) % 3] << endl;
+
+        p1 = p[i];
+        p2 = p[(i+1) % 3];
+        p3 = p[(i+2) % 3];
+
+        cw = a.isClockwise(b);
+        cphi = n().cosPhi(g);
+
+        //cerr << "Is cloclwise: " << cw << endl;
+        //cerr << "Cos Phi: " << cphi << endl;  
+
         
-        cerr << *this << endl;
+
+
+        
+        
+        ////cerr << *this << endl;
     }
 };
 
@@ -169,26 +201,7 @@ struct Edge {
     Point p1, p2, p3;
 
     Edge() = default;
-    Edge(const Point &p1, const Point &p2, const Point &p3) : p1(p1), p2(p2), p3(p3) {
-        //sort();
-    }
-
-    void sort() {
-        cerr << "Sort " << *this << endl;
-
-        
-
-        double cw = Vector(p3, p1).isClockwise(Vector(p3, p2));
-        cerr << "Is cloclwise: " << Vector(p3, p1) << " and " << Vector(p3, p2) << ": " << cw << endl;
-        if (cw) {
-            cerr << "Swap!" << endl;
-            std::swap(p1, p2);
-
-        }
-
-        
-        cerr << *this << endl;
-    }
+    Edge(const Point &p1, const Point &p2, const Point &p3) : p1(p1), p2(p2), p3(p3) {}
 
     bool operator==(const Edge &e) const {
         set<int> s;
@@ -200,7 +213,7 @@ struct Edge {
     }
 
     friend ostream& operator<<(ostream& out, const Edge& e) {
-        out << "Edge(" << e.p1.id << ", " << e.p2.id << " : " << e.p3.id << ")";
+        out << "Edge(" << e.p1.id << ", " << e.p2.id << " : " << e.p3.id << ") ";
         return out;
     }
 };
@@ -231,23 +244,32 @@ std::ostream& operator<<(std::ostream &out, set<T> v) {
 
 
 const double INF = 1e99;
-static Point nil = {INF, INF, INF, -1};
-Point *NIL = &nil;
 
 vector<Facet> solve(vector<Point> &points) {
     int n = points.size();
+    double cx = 0, cy = 0, cz = 0;
+
+    for (auto p : points) {
+        cx += p.x;
+        cy += p.y;
+        cz += p.z;
+    }
+
+    Point center(cx / n, cy / n, cz / n);
+    //cerr << "Center: " << center << endl;
+
     vector<Facet> facets;
 
     vector<Edge> edges;
     vector<Point> S;
 
-    cerr << points << endl;
+    ////cerr << points << endl;
 
     sort(points.begin(), points.end(), [](const Point &a, const Point &b) {
         return (a.z < b.z ? true : false);
     });
 
-    cerr << points << endl;
+    ////cerr << points << endl;
     
     Point &p0 = points[0];
     S.push_back(points[0]);
@@ -258,14 +280,14 @@ vector<Facet> solve(vector<Point> &points) {
         S.push_back(points[i]);
         
         double cur_cos = Vector(p0, points[i]).cosPhi(Vector(0, 0, 1));
-        cerr << "Cos(" << points[i] << ") = " << cur_cos << endl; 
+        ////cerr << "Cos(" << points[i] << ") = " << cur_cos << endl; 
         if (cur_cos < min_cos) {
             min_cos = cur_cos;
             min_i = i;
         }
     }
-    cerr << "S0: " << endl << S << endl;
-    cerr << min_i << endl;
+    ////cerr << "S0: " << endl << S << endl;
+    ////cerr << min_i << endl;
 
     
     min_cos = 1;
@@ -276,18 +298,18 @@ vector<Facet> solve(vector<Point> &points) {
         Facet f(p0, points[min_i], points[j]);
 
         double cur_cos = Vector(p0, points[j]).cosPhi(Vector(0, 0, 1));
-        cerr << "Cos(" << f << ", n=" << f.n() << ") = " << cur_cos << endl; 
+        ////cerr << "Cos(" << f << ", n=" << f.n() << ") = " << cur_cos << endl; 
         if (cur_cos < min_cos) {
             min_cos = cur_cos;
             min_j = j;
         }
     }
 
-    cerr << min_j << endl;
+    ////cerr << min_j << endl;
 
     facets.insert(facets.begin(), Facet(p0, points[min_i], points[min_j]));
     
-    cerr << facets[0] << endl;
+    ////cerr << facets[0] << endl;
 
     edges.push_back({facets[0].p3, facets[0].p1, facets[0].p2});
     edges.push_back({facets[0].p2, facets[0].p3, facets[0].p1});
@@ -296,15 +318,15 @@ vector<Facet> solve(vector<Point> &points) {
     bool is_new_edges = true;
     while (is_new_edges && !edges.empty() && !S.empty()) {
         is_new_edges = false;
-        cerr << "Edges: " << endl;
-        cerr << edges << endl;
+        ////cerr << "Edges: " << endl;
+        ////cerr << edges << endl;
 
         
         
             Edge e = edges[0];
             Vector n = Facet(e.p1, e.p2, e.p3).n();
 
-            cerr << "Last edge: " << e << endl;
+            ////cerr << "Last edge: " << e << endl;
             Point p1, p2;
 
             p1 = e.p1;
@@ -313,13 +335,13 @@ vector<Facet> solve(vector<Point> &points) {
             
             double min_cos = 1;
             Point min_p;
-            cerr << "S: " << endl << S << endl;
+            ////cerr << "S: " << endl << S << endl;
             for (auto p : S) {
-                cerr << "p = " << p << endl;
+                ////cerr << "p = " << p << endl;
                 Vector Vn = Facet(p, p1, p2).n();
 
                 double cur_cos = n.cosPhi(Vn);
-                cerr << "Cos(" << Vn << ", " << n << ") = " << cur_cos << endl;
+                ////cerr << "Cos(" << Vn << ", " << n << ") = " << cur_cos << endl;
                 if (cur_cos < min_cos) {
                     min_cos = cur_cos;
                     min_p = p;
@@ -330,7 +352,7 @@ vector<Facet> solve(vector<Point> &points) {
 
             if (find(facets.begin(), facets.end(), Facet{min_p, p2, p1}) == facets.end()) {
                 facets.insert(facets.begin(), Facet(min_p, p2, p1));
-                cerr << "Found new Facet: " << min_p << facets[0] << endl;
+                ////cerr << "Found new Facet: " << min_p << facets[0] << endl;
                 if (find(edges.begin(), edges.end(), Edge{min_p, p2, p1}) == edges.end()) {
                     edges.push_back({min_p, p2, p1});
                     is_new_edges = true;
@@ -341,7 +363,7 @@ vector<Facet> solve(vector<Point> &points) {
                     is_new_edges = true;
                 }
             } else {
-                cerr << "Found old Facet: " << min_p << Facet(min_p, p2, p1) << endl;
+                ////cerr << "Found old Facet: " << min_p << Facet(min_p, p2, p1) << endl;
                 if (find(S.begin(), S.end(), min_p) != S.end()) {
                     //S.erase(find(S.begin(), S.end(), min_p));
                     is_new_edges = true;
@@ -350,39 +372,40 @@ vector<Facet> solve(vector<Point> &points) {
             
     }
 
-    
+    for (int i = 0; i < facets.size(); i++) {
+        facets[i].sort(center);
+    }
 
     return facets;
 }
 
 int main() {
     freopen("input.txt", "r", stdin);
-    int n;
-    cin >> n;
+    int t = 1, n;
+    cin >> t;
+    while (t--) {
+        cin >> n;
 
-    vector<Point> points(n); // input
-    for (int i = 0; i < n; i++) { 
-        cin >> points[i].x; cin >> points[i].y; cin >> points[i].z;
-        points[i].id = i; 
-    }
+        vector<Point> points(n); // input
+        for (int i = 0; i < n; i++) { 
+            cin >> points[i].x; cin >> points[i].y; cin >> points[i].z;
+            points[i].id = i; 
+        }
 
-    vector<Facet> facets = solve(points);
+        vector<Facet> facets = solve(points);
 
-    cout << facets.size() << endl;
+        cout << facets.size() << endl;
 
-    for (int i = 0; i < facets.size(); i++) {
-        facets[i].sort();
-        //cout << facets[i] << endl;
         
-    }
 
-    sort(facets.begin(), facets.end(), [](const Facet& a, const Facet& b) {
-        return pair<int, int>{a.p1.id, a.p2.id} < pair<int, int>{b.p1.id, b.p2.id};
-    });
-    cerr << "After sort: " << endl;
-    for (int i = 0; i < facets.size(); i++) {
-        
-        cout << facets[i] << endl;
+        sort(facets.begin(), facets.end(), [](const Facet& a, const Facet& b) {
+            return pair<int, int>{a.p1.id, a.p2.id} < pair<int, int>{b.p1.id, b.p2.id};
+        });
+        ////cerr << "After sort: " << endl;
+        for (int i = 0; i < facets.size(); i++) {
+            
+            cout << facets[i] << endl;
+        }
     }
 
 
