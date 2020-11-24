@@ -5,7 +5,7 @@
 #include <set>
 #include <cmath>
 
-#define DBL_EPSILON 1e-09
+#define DBL_EPSILON 1e-019
 
 using namespace std;
 
@@ -128,23 +128,22 @@ struct Facet {
 
         auto min_id = (*min_element(p.begin(), p.end(), [](const Point& a, const Point& b) { return a.id < b.id; })).id;
 
+        Vector a, b, c;
+
         int i = 0;
         for (; i < p.size() && p[i].id != min_id; i++) {
-            Vector a = Vector(p[i], p[(i+1) % 3]);
-            Vector b = Vector(p[(i+1) % 3], p[(i+2) % 3]);
-            Vector c = Vector(p[i], p[(i+2) % 3]);
+            a = Vector(p[i], p[(i+1) % 3]);
+            b = Vector(p[(i+1) % 3], p[(i+2) % 3]);
+            c = Vector(p[i], p[(i+2) % 3]);
             //cerr << i + 1 << ": " << a << "^ " << b << " = " << (a ^ b) << endl;
         }
 
         //cerr << "Started from min:" << endl; 
         //cerr << p[i] << p[(i+1) % 3] << p[(i+2) % 3] << endl;
+   
 
-        Vector a = Vector(p[i], p[(i+1) % 3]);
-        Vector b = Vector(p[(i+1) % 3], p[(i+2) % 3]);
-        Vector c = Vector(p[i], p[(i+2) % 3]);
-
-        ////cerr << "AB x BC" << ": " << a << "^ " << b << " = " << (a ^ b) << endl;
-        ////cerr << "AB x AC" << ": " << a << "^ " << c << " = " << (a ^ c) << endl;
+        //cerr << "AB x BC" << ": " << a << "^ " << b << " = " << (a ^ b) << endl;
+        //cerr << "AB x AC" << ": " << a << "^ " << c << " = " << (a ^ c) << endl;
 
         bool cw = a.isClockwise(b);
         double cphi = n().cosPhi(g);
@@ -193,7 +192,7 @@ struct Facet {
 
         
         
-        ////cerr << *this << endl;
+        //cerr << *this << endl;
     }
 };
 
@@ -263,15 +262,16 @@ vector<Facet> solve(vector<Point> &points) {
     vector<Edge> edges;
     vector<Point> S;
 
-    ////cerr << points << endl;
+    //cerr << points << endl;
 
     sort(points.begin(), points.end(), [](const Point &a, const Point &b) {
         return (a.z < b.z ? true : false);
     });
 
-    ////cerr << points << endl;
+    //cerr << points << endl;
     
     Point &p0 = points[0];
+    //cerr << "First point: " << p0 << endl;
     S.push_back(points[0]);
         
     double min_cos = 1;
@@ -280,14 +280,14 @@ vector<Facet> solve(vector<Point> &points) {
         S.push_back(points[i]);
         
         double cur_cos = Vector(p0, points[i]).cosPhi(Vector(0, 0, 1));
-        ////cerr << "Cos(" << points[i] << ") = " << cur_cos << endl; 
+        //cerr << "Cos(" << points[i] << ") = " << cur_cos << endl; 
         if (cur_cos < min_cos) {
             min_cos = cur_cos;
             min_i = i;
         }
     }
-    ////cerr << "S0: " << endl << S << endl;
-    ////cerr << min_i << endl;
+    //cerr << "S0: " << endl << S << endl;
+    //cerr << min_i << endl;
 
     
     min_cos = 1;
@@ -297,19 +297,19 @@ vector<Facet> solve(vector<Point> &points) {
 
         Facet f(p0, points[min_i], points[j]);
 
-        double cur_cos = Vector(p0, points[j]).cosPhi(Vector(0, 0, 1));
-        ////cerr << "Cos(" << f << ", n=" << f.n() << ") = " << cur_cos << endl; 
+        double cur_cos = f.cosPhi(Vector(0, 0, 1));
+        //cerr << "Cos(" << f << ", n=" << f.n() << ") = " << cur_cos << endl; 
         if (cur_cos < min_cos) {
             min_cos = cur_cos;
             min_j = j;
         }
     }
 
-    ////cerr << min_j << endl;
+    //cerr << min_j << endl;
 
     facets.insert(facets.begin(), Facet(p0, points[min_i], points[min_j]));
     
-    ////cerr << facets[0] << endl;
+    //cerr << facets[0] << endl;
 
     edges.push_back({facets[0].p3, facets[0].p1, facets[0].p2});
     edges.push_back({facets[0].p2, facets[0].p3, facets[0].p1});
@@ -318,15 +318,15 @@ vector<Facet> solve(vector<Point> &points) {
     bool is_new_edges = true;
     while (is_new_edges && !edges.empty() && !S.empty()) {
         is_new_edges = false;
-        ////cerr << "Edges: " << endl;
-        ////cerr << edges << endl;
+        //cerr << "Edges: " << endl;
+        //cerr << edges << endl;
 
         
         
             Edge e = edges[0];
             Vector n = Facet(e.p1, e.p2, e.p3).n();
 
-            ////cerr << "Last edge: " << e << endl;
+            //cerr << "Last edge: " << e << endl;
             Point p1, p2;
 
             p1 = e.p1;
@@ -335,13 +335,13 @@ vector<Facet> solve(vector<Point> &points) {
             
             double min_cos = 1;
             Point min_p;
-            ////cerr << "S: " << endl << S << endl;
+            //cerr << "S: " << endl << S << endl;
             for (auto p : S) {
-                ////cerr << "p = " << p << endl;
+                //cerr << "p = " << p << endl;
                 Vector Vn = Facet(p, p1, p2).n();
 
                 double cur_cos = n.cosPhi(Vn);
-                ////cerr << "Cos(" << Vn << ", " << n << ") = " << cur_cos << endl;
+                //cerr << "Cos(" << Vn << ", " << n << ") = " << cur_cos << endl;
                 if (cur_cos < min_cos) {
                     min_cos = cur_cos;
                     min_p = p;
@@ -352,7 +352,7 @@ vector<Facet> solve(vector<Point> &points) {
 
             if (find(facets.begin(), facets.end(), Facet{min_p, p2, p1}) == facets.end()) {
                 facets.insert(facets.begin(), Facet(min_p, p2, p1));
-                ////cerr << "Found new Facet: " << min_p << facets[0] << endl;
+                //cerr << "Found new Facet: " << min_p << facets[0] << endl;
                 if (find(edges.begin(), edges.end(), Edge{min_p, p2, p1}) == edges.end()) {
                     edges.push_back({min_p, p2, p1});
                     is_new_edges = true;
@@ -363,7 +363,7 @@ vector<Facet> solve(vector<Point> &points) {
                     is_new_edges = true;
                 }
             } else {
-                ////cerr << "Found old Facet: " << min_p << Facet(min_p, p2, p1) << endl;
+                //cerr << "Found old Facet: " << min_p << Facet(min_p, p2, p1) << endl;
                 if (find(S.begin(), S.end(), min_p) != S.end()) {
                     //S.erase(find(S.begin(), S.end(), min_p));
                     is_new_edges = true;
@@ -401,7 +401,7 @@ int main() {
         sort(facets.begin(), facets.end(), [](const Facet& a, const Facet& b) {
             return pair<int, int>{a.p1.id, a.p2.id} < pair<int, int>{b.p1.id, b.p2.id};
         });
-        ////cerr << "After sort: " << endl;
+        //cerr << "After sort: " << endl;
         for (int i = 0; i < facets.size(); i++) {
             
             cout << facets[i] << endl;
