@@ -254,7 +254,7 @@ int main() {
     for (int i = 0; i < ans.size() - 1; i++) {
         Point a = ans[i], b = ans[i+1];
 
-        if (a.y * b.y <= 0 && !(x == a.x && 0 == a.y)) {
+        if (a.y * b.y <= 0 && !(x0 == a.x && 0 == a.y)) {
             x0 = getX(a, b);
             if (x0 > 0 && x0 < INF) {
                 //std::cerr << "x[" << i << "] = " << x0 << std::endl;
