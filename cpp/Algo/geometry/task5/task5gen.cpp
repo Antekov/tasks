@@ -40,7 +40,7 @@ int main() {
     
     int t = 1;
 
-    while (t < 20) {
+    while (t < 200) {
 
         auto seg = generate_seg();
         std::cerr << "Test: " << t << std::endl;
@@ -69,7 +69,7 @@ int main() {
             std::cout << "ERROR" << std::endl;
             std::cout << numbers1.first + 1 << " " << numbers1.second + 1 << std::endl;
             std::cout << numbers2.first + 1 << " " << numbers2.second + 1 << std::endl;
-            break;
+            //break;
         }
         t++;
     }

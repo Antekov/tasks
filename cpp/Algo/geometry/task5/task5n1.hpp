@@ -7,7 +7,7 @@
 #include <iomanip>
 
 namespace n1 {
-#define DBL_EPSILON 2.2204460492503131e-016
+#define DBL_EPSILON 2.2204460492503131e-09
 #define INF 1e+49
 
 template <class T>
@@ -51,6 +51,38 @@ struct Segment2D {
         return out;
     }
 
+    Point2D intersectPoint(Segment2D s) const {
+        double k1, k2, b1, b2, px = INF, py = INF;
+        if (abs(end.x - start.x) <= DBL_EPSILON) {
+            px = start.x;
+            py = intersectY1(px);
+        } else if (abs(s.end.x - s.start.x) <= DBL_EPSILON) {
+            px = s.start.x;
+            py = s.intersectY1(px);
+        } else {
+            k1 = (end.y - start.y) / (end.x - start.x);
+
+            k2 = (s.end.y - s.start.y) / (s.end.x - s.start.x);
+            b1 = start.y - k1*start.x;
+            b2 = s.start.y - k2*s.start.x; 
+            std::cerr << k1 << " " << b1 << " " << k2 << " " << b2 << std::endl; 
+            std::cerr << "abs(k2 - k1)" << " = " << fabs(k2 - k1) << std::endl; 
+            if (fabs(k2 - k1) <= DBL_EPSILON) {
+                if (fabs(b1 - b2) <= DBL_EPSILON) {
+                    px = std::min(start.x, s.start.x);
+                    py = k1 * px + b1;
+                } else {
+                    px = INF, py = INF;
+                }
+            } else {
+                
+                px = (b1 - b2) / (k2 - k1);
+                py = k1 * px + b1;
+            }
+        }
+        return Point2D(px, py);
+    }
+
     double intersectY1(double px) const {
         double py = INF;
         if (abs(start.x - end.x) <= DBL_EPSILON) {
@@ -63,14 +95,14 @@ struct Segment2D {
 
     bool intersectX(const Segment2D &s) const {
         return 
-            std::max(start.x, end.x) >= std::min(s.start.x, s.end.x) ||
-            std::min(start.x, end.x) >= std::max(s.start.x, s.end.x);
+            std::max(start.x, end.x) >= std::min(s.start.x, s.end.x) - DBL_EPSILON ||
+            std::min(start.x, end.x) >= std::max(s.start.x, s.end.x) - DBL_EPSILON;
     }
 
     bool intersectY(const Segment2D &s) const {
         return 
-            std::max(start.y, end.y) >= std::min(s.start.y, s.end.y) ||
-            std::min(start.y, end.y) >= std::max(s.start.y, s.end.y);
+            std::max(start.y, end.y) >= std::min(s.start.y, s.end.y) - DBL_EPSILON ||
+            std::min(start.y, end.y) >= std::max(s.start.y, s.end.y) - DBL_EPSILON;
     }
 
     int product(const Point2D &c) const {
@@ -82,6 +114,12 @@ struct Segment2D {
         return this->intersectX(s) && this->intersectY(s) 
             && this->product(s.start) * this->product(s.end) <= 0
             && s.product(this->start) * s.product(this->end) <= 0;
+    }
+
+    bool intersect1(const Segment2D &s) const {
+        Point2D o = this->intersectPoint(s);
+        std::cerr << *this << " intersect " << s << " at " << o << std::endl;
+        return std::min(this->start.x, this->end.x) <= o.x && o.x <= std::max(this->start.x, this->end.x);
     }
 };
 
@@ -179,15 +217,6 @@ std::pair<int, int> solve(const std::vector<std::vector<int>> &seg) {
                     break;    
                 }
 
-                /*
-                if (pos != intersect.end() && prev != intersect.end() && segments[*pos].intersect(segments[*next])) {
-                    std::cerr << "Found prev-next: " << std::endl;
-                    numbers = {*prev, *next};
-                    found = true;
-                    break;    
-                }
-                */
-
                 std::cerr << "After adding " << *iter1 << " before ";
                 std::cerr << ((pos != intersect.end()) ? (*pos) : -1) << ":" << std::endl;
                 if (pos != intersect.end()) {
@@ -207,12 +236,6 @@ std::pair<int, int> solve(const std::vector<std::vector<int>> &seg) {
                 
                 iter1++;
             }
-            /*
-            std::copy(started[x[k]].begin(), started[x[k]].end(), std::back_inserter(intersect));
-            std::sort(intersect.begin(), intersect.end(), [segments](int i, int j) {
-                return segments[i].start.y < segments[j].start.y; 
-            });
-            */
         }
 
         if (found) break;
@@ -266,7 +289,7 @@ std::pair<int, int> solve(const std::vector<std::vector<int>> &seg) {
         if (numbers.first < numbers.second) {
             return numbers;
         } else {
-           return std::pair<int, int>{numbers.second, numbers.first};
+           return {numbers.second, numbers.first};
         }
     }
     return std::pair<int, int>{-100000, -100000};
