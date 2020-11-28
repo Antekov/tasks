@@ -1,9 +1,8 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
-#include <cassert>
-#define DBL_EPSILON 2.2204460492503131e-016
-
+#include <cfloat>
+#include <algorithm>
 using namespace std;
 
 class Vector3D;
@@ -17,7 +16,9 @@ struct Point3D {
     Point3D(const Point3D& ) = default;
     Point3D(const Vector3D& v);
 
-    friend ostream& operator<<(ostream &out, const Point3D &v) {
+    double dist_to(const Vector3D &u) const;
+
+    friend std::ostream& operator<<(std::ostream &out, const Point3D &v) {
         out << "Point3D(" << v.x << ", " << v.y << ", " << v.z << ")";
         return out;
     }
@@ -38,6 +39,10 @@ public:
 
     Vector3D operator*(const double a) const {
         return Vector3D(x*a, y*a, z*a, start);
+    }
+
+    Point3D end() {
+        return Point3D(*this);
     }
 
     double norm() const {
@@ -67,7 +72,7 @@ public:
     bool isCoplanar(const Vector3D &a) const {
         double mix = Vector3D(this->start, a.start).mix(*this, a);
 
-        return abs(mix) <= DBL_EPSILON;
+        return abs(mix) < DBL_EPSILON;
     }
 
     double cosPhi(const Vector3D &a) const {
@@ -83,7 +88,7 @@ public:
         return (abs(abs(this->cosPhi(a)) - 1) <= DBL_EPSILON);
     }
 
-    friend ostream& operator<<(ostream &out, const Vector3D &v) {
+    friend std::ostream& operator<<(std::ostream &out, const Vector3D &v) {
         out << "Vector3D(" << v.x << ", " << v.y << ", " << v.z << ") from (" 
             << v.start.x << ", " << v.start.y << ", " << v.start.z << ")";
         return out;
@@ -92,6 +97,23 @@ public:
 
 Point3D::Point3D(const Vector3D& v) :
     Point3D(v.x + v.start.x, v.y + v.start.y, v.z + v.start.z) {}
+
+double Point3D::dist_to(const Vector3D &u) const {
+        //std::cerr << "u1: " << u << endl;
+        //std::cerr << "C1: " << C << endl; 
+        Vector3D w(u.start, *this);
+        //std::cerr << "w1: " << w << endl;
+        Point3D N;
+        if (u.cosPhi(w) > 0) {
+            N = u * std::min(1.0, (1/u.norm()) * w.norm() * u.cosPhi(w));
+        } else {
+            //std::cerr << "N = u.start" << endl; 
+            N = u.start;
+        }
+        //std::cerr << "M: " << M << std::endl;
+        //std::cerr << "N: " << N << std::endl;
+        return Vector3D(*this, N).norm();
+    }
 
 double dist1(Vector3D u, Point3D C) {
     //std::cerr << "u1: " << u << endl;
@@ -113,34 +135,20 @@ double dist1(Vector3D u, Point3D C) {
 double dist(Vector3D u, Vector3D v) {
     Point3D A, B, C, D, M, N;
     A = u.start;
-    B = u;
+    B = u.end();
     C = v.start;
-    D = v;
+    D = v.end();
 
     Vector3D w(u.start, v.start);
 
-    //std::cerr << "u: " << u << endl;
-    //std::cerr << "v: " << v << endl;
-    //std::cerr << "w: " << w << endl;
-
     if (u.isCollinear(v)) {
-        std::cerr << "AB collinear to CD" << std::endl;
-
+        //std::cerr << "AB collinear to CD" << std::endl;
         return std::min(
-            std::min(dist1(u, v.start), dist1(u, v)), 
-            std::min(dist1(v, u.start), dist1(v, u))
+            std::min(v.start.dist_to(u), v.end().dist_to(u)),
+            std::min(u.start.dist_to(v), u.end().dist_to(v))
         );
-        
-        /*
-        M = v.start;
-        if (u.cosPhi(w) >= 0) {
-            N = u * (1/u.norm()) * w.norm() * u.cosPhi(w);
-        } else {
-            N = u.start;
-        }
-        */
     } else if (u.isCoplanar(v)) {
-        std::cerr << "AB coplanar to CD" << std::endl;
+        //std::cerr << "AB coplanar to CD" << std::endl;
         double Det1 = -u.x * v.y + v.x * u.y;
         double Det2 = -u.x * v.z + v.x * u.z;
         double Det3 = -u.y * v.z + v.y * u.z;
@@ -176,7 +184,7 @@ double dist(Vector3D u, Vector3D v) {
             //std::cerr << "Point A" << std::endl;
             M = A;
             P1 = B;
-        } else if (a < 1) {
+        } else if (a < 1.0) {
             //std::cerr << "Point M" << std::endl;
             M = au;
             P1 = A;
@@ -190,7 +198,7 @@ double dist(Vector3D u, Vector3D v) {
             //std::cerr << "Point C" << std::endl;
             N = C;
             P2 = D;
-        } else if (b < 1) {
+        } else if (b < 1.0) {
             //std::cerr << "Point N" << std::endl;
             N = bv;
             P2 = C;
@@ -232,7 +240,7 @@ double dist(Vector3D u, Vector3D v) {
         //std::cerr << "P: " << P << std::endl;
         //std::cerr << "M: " << M << std::endl;
         //std::cerr << "N: " << N << std::endl;
-
+        return Vector3D(M, N).norm();
         
     } else {
         std::cerr << "AB not coplanar to CD" << std::endl;
@@ -273,25 +281,25 @@ double dist(Vector3D u, Vector3D v) {
         M = au;
         N = bv;
 
-        if ((0 <= a && a <= 1) && !(0 <=b && b <= 1)) {
+        if ((0 <= a && a <= 1.0) && !(0 <=b && b <= 1.0)) {
             //std::cerr << "M: Point au" << std::endl;
 
             if (b <= DBL_EPSILON) {
                 //std::cerr << "N: Point C" << std::endl;
                 N = C;
-            } else if (b > 1) {
+            } else if (b > 1.0) {
                 //std::cerr << "N: Point D" << std::endl;
                 N = D;
             }
             return dist1(u, N);
             
-        } else if (!(0 <= a && a <= 1) && (0 <= b && b <= 1)) {
+        } else if (!(0 <= a && a <= 1.0) && (0 <= b && b <= 1.0)) {
             //std::cerr << "N: Point bv" << std::endl;
             
             if (a <= DBL_EPSILON) {
                 //std::cerr << "M: Point A" << std::endl;
                 M = A;
-            } else if (a > 1) {
+            } else if (a > 1.0) {
                 //std::cerr << "M: Point B" << std::endl;
                 M = B;
             }
@@ -304,7 +312,7 @@ double dist(Vector3D u, Vector3D v) {
                 //std::cerr << "a < 0, b < 0, MA >= NC: " << Vector3D(M, A).norm() << " >= " << Vector3D(N, C).norm() << endl;
                 return dist1(v, A);
             }
-        } else if (a > 1 && b > 1) {
+        } else if (a > 1.0 && b > 1.0) {
             if (Vector3D(M, B).norm() < Vector3D(N, D).norm()) {
                 //std::cerr << "a > 1, b > 1, MB < ND" << endl;
                 return dist1(u, D); 
@@ -332,92 +340,28 @@ double dist(Vector3D u, Vector3D v) {
         } else {
             return Vector3D(M, N).norm();
         }
-
-        assert(false);
-
-        if (a <= DBL_EPSILON) {
-            //std::cerr << "Point A" << std::endl;
-            M = A;
-        } else if (a < 1) {
-            //std::cerr << "Point M" << std::endl;
-            M = au;
-        } else {
-            //std::cerr << "Point B" << std::endl;
-            M = B;
-            
-        }
-        double d1 = dist(v, Vector3D(v.x, v.y, v.z, M));
-        //std::cerr << "d1=" << d1 << endl;
-
-        if (b <= DBL_EPSILON) {
-            //std::cerr << "Point C" << std::endl;
-            N = C;
-        } else if (b < 1) {
-            //std::cerr << "Point N" << std::endl;
-            N = bv;
-        } else {
-            //std::cerr << "Point D" << std::endl;
-            N = D;
-        }
-        double d2 = dist(u, Vector3D(u.x, u.y, u.z, N));
-        //std::cerr << "d2=" << d2 << endl;
-
-        Vector3D n(au, bv);
-        //std::cerr << "n: " << n << std::endl;
-        //std::cerr << "M1: " << Point3D(au) << std::endl;
-        //std::cerr << "N2: " << Point3D(bv) << std::endl;
-        //std::cerr << au + n << " == " << w + bv << std::endl;
-
-        //std::cerr << "(n * u): " << n * u << std::endl;
-        //std::cerr << "(n * u) = w * u + b*uv - a*u2: " << w * u + b*uv - a*u2 << std::endl;
-        //std::cerr << "(n * v): " << n * v << std::endl;
-
-        //std::cerr << "(n * v) = w * v + b*v2 - a*uv: " << w * v + b*v2 - a*uv << std::endl;
-
-        
+      
     }
-
-    Vector3D n(M, N);
-    //std::cerr << "M: " << M << endl;
-    //std::cerr << "N: " << N << endl;    
-    //std::cerr << "MN: " << n << endl;
-    //std::cerr << "d(MN) = " << n.norm() << endl;
-
-    return n.norm();
 }
 
 double solve(double x1, double y1, double z1,
     double x2, double y2, double z2,
     double x3, double y3, double z3,
     double x4, double y4, double z4) {
-    //freopen("input.txt", "r", stdin);
-
-    Point3D A{x1, y1, z1};
-
-    Point3D B{x2, y2, z2};
-
-    Point3D C{x3, y3, z3};
-
-    Point3D D{x4, y4, z4};
-
-    Vector3D u(A, B);
-    Vector3D v(C, D);
     
-    return dist(u, v);
+    return dist(
+        Vector3D({x1, y1, z1}, {x2, y2, z2}), 
+        Vector3D({x3, y3, z3}, {x4, y4, z4})
+    );
 }
 
 int main() {
-    double x1, y1, z1, x2, y2, z2;
-    double x3, y3, z3, x4, y4, z4;
-    
-    std::cin >> x1 >> y1 >> z1;
-    std::cin >> x2 >> y2 >> z2;
-    std::cin >> x3 >> y3 >> z3;
-    std::cin >> x4 >> y4 >> z4;
+    double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4;
+    std::cin >> x1 >> y1 >> z1 >> x2 >> y2 >> z2 >> x3 >> y3 >> z3 >> x4 >> y4 >> z4;
 
     double d = solve(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4);
     
-    std::cout << std::fixed << std::setprecision(7) << d << endl;
+    std::cout << std::fixed << std::setprecision(7) << d << std::endl;
     
     return 0;
 }

@@ -233,10 +233,19 @@ double dist(Vector3D u, Vector3D v) {
         std::cerr << "N: " << N << std::endl;
         std::cerr << "PN: " << PN << std::endl;
         std::cerr << "MH: " << Vector3D(PN.x, PN.y, PN.z, M) << std::endl; 
+        /*
         double d1 = dist(PN, Vector3D(PN.x, PN.y, PN.z, M));
         
         std::cerr << "d1 = " << d1 << std::endl;
-        //return d1;
+        return d1;
+        */
+        Vector3D n(M, N);
+        std::cerr << "M: " << M << std::endl;
+        std::cerr << "N: " << N << std::endl;    
+        std::cerr << "MN: " << n << std::endl;
+        std::cerr << "d(MN) = " << n.norm() << std::endl;
+
+        return n.norm();
         
     } else {
         std::cerr << "AB not coplanar to CD" << std::endl;
@@ -335,59 +344,10 @@ double dist(Vector3D u, Vector3D v) {
             }
         } else {
             return Vector3D(M, N).norm();
-        }
-
-        assert(false);
-
-        if (a <= DBL_EPSILON) {
-            std::cerr << "Point A" << std::endl;
-            M = A;
-        } else if (a < 1) {
-            std::cerr << "Point M" << std::endl;
-            M = au;
-        } else {
-            std::cerr << "Point B" << std::endl;
-            M = B;
-            
-        }
-        double d1 = dist(v, Vector3D(v.x, v.y, v.z, M));
-        std::cerr << "d1=" << d1 << std::endl;
-
-        if (b <= DBL_EPSILON) {
-            std::cerr << "Point C" << std::endl;
-            N = C;
-        } else if (b < 1) {
-            std::cerr << "Point N" << std::endl;
-            N = bv;
-        } else {
-            std::cerr << "Point D" << std::endl;
-            N = D;
-        }
-        double d2 = dist(u, Vector3D(u.x, u.y, u.z, N));
-        std::cerr << "d2=" << d2 << std::endl;
-
-        Vector3D n(au, bv);
-        std::cerr << "n: " << n << std::endl;
-        std::cerr << "M1: " << Point3D(au) << std::endl;
-        std::cerr << "N2: " << Point3D(bv) << std::endl;
-        std::cerr << au + n << " == " << w + bv << std::endl;
-
-        std::cerr << "(n * u): " << n * u << std::endl;
-        std::cerr << "(n * u) = w * u + b*uv - a*u2: " << w * u + b*uv - a*u2 << std::endl;
-        std::cerr << "(n * v): " << n * v << std::endl;
-
-        std::cerr << "(n * v) = w * v + b*v2 - a*uv: " << w * v + b*v2 - a*uv << std::endl;
-
-        
+        }        
     }
 
-    Vector3D n(M, N);
-    std::cerr << "M: " << M << std::endl;
-    std::cerr << "N: " << N << std::endl;    
-    std::cerr << "MN: " << n << std::endl;
-    std::cerr << "d(MN) = " << n.norm() << std::endl;
-
-    return n.norm();
+    
 }
 
 double solve(double x1, double y1, double z1,
