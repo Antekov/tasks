@@ -201,7 +201,7 @@ double dist_coplanar(Vector3D u, Vector3D v) {
     Vector3D OP(O, P);
     Vector3D ON(O, N);
 
-    Vector3D OE = OP * (1/OP.norm()) * MO.norm() * abs(u.cosPhi(v));
+    Vector3D OE = OP * (1/OP.norm()) * MO.norm() * fabs(u.cosPhi(v));
 
     if (OE.norm() > OP.norm()) {
         N = P;    
