@@ -1,3 +1,4 @@
+# https://www.e-olymp.com/ru/submissions/8012686
 import sys
 sys.setrecursionlimit(10000)
 n = 8
@@ -210,10 +211,10 @@ def solve(runner, termy, walls):
         if len(R) > 0:
             U -= R
         else:
-            print(f'Break U: {len(U)} | N: {len(N)} | P: {len(P)}') 
+            # print(f'Break U: {len(U)} | N: {len(N)} | P: {len(P)}') 
             break
 
-        print(f'U: {len(U)} | N: {len(N)} | P: {len(P)}')          
+        # print(f'U: {len(U)} | N: {len(N)} | P: {len(P)}')          
 
 
     if startPosition in winPositions:
