@@ -189,7 +189,7 @@ def solve(runner, termy, walls):
             print(f'U: {len(U)} | N: {len(N)} | P: {len(P)}')
     '''
     # print('Start position:', startPosition)
-    # print(f'Start: U: {len(U)} | N: {len(N)} | P: {len(P)}')
+    print(f'Start: U: {len(U)} | N: {len(N)} | P: {len(P)}')
     
     while len(U) > 0 and startPosition not in N and startPosition not in P:
         R = set()
@@ -222,7 +222,7 @@ def solve(runner, termy, walls):
     elif startPosition in losePositions:
         print(-1)
     else:
-        print(-1)
+        print(-2)
 
 
 f = open('input.txt', 'r')

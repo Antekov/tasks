@@ -23,7 +23,7 @@ struct Position {
             return false;
         if (!isRunnerStep && p.isRunnerStep)
             return true;
-        if (isRunnerStep && p.isRunnerStep)
+        if (isRunnerStep && !p.isRunnerStep)
             return false;
         return false;
         
@@ -50,8 +50,7 @@ class Game {
 public:
     Game(int runner, int termy, std::set<std::pair<int, int>> &walls) : 
         startPosition(runner, termy, true),
-        walls(walls) {        
-    }
+        walls(walls) {}
 private:
 
     bool isRunnerStep(Position &pos) {
@@ -87,7 +86,7 @@ private:
                 int stepx = x2 > x1 ? 1 : -1;
                 int stepy = y2 > y1 ? 1 : -1;
                 for (int x = x1 + stepx, y = y1 + stepy; 
-                    x < x2; x += stepx, y += stepy) {
+                    x != x2; x += stepx, y += stepy) {
                     if (walls.count({y, x}) != 0) {
                         return false;
                     }
@@ -146,7 +145,7 @@ private:
 
             if (px < 0 || px >= n || py < 0 || py >= n) continue;
 
-            if (walls.count({y, x}) != 0) {
+            if (walls.count({py, px}) != 0) {
                 continue;
             }
 
@@ -176,26 +175,8 @@ int solve() {
 
         while (q.size() > 0) {
             Position position = q[0];
-            std::cerr << "Get from queue: " << q[0] << std::endl;
+            //std::cerr << "Get from queue: " << q[0] << std::endl;
             q.erase(q.begin());
-
-            int count1 = usedPositions.size();
-            /*
-            usedPositions.insert(position);
-            if (position == Position({20, 17, true})) {
-                std::cerr << "Handle " << position << " | usedPositions.count(position) = " << usedPositions.count(position) << std::endl;
-                std::cerr << "Handle " << position << " | count(position) = " << std::count(usedPositions.begin(), usedPositions.end(), position) << std::endl;
-
-                for (auto &pos : usedPositions) {
-                    if (pos == Position({20, 17, true})) {
-                        std::cerr << "Found" << std::endl;
-                        break;
-                    }
-                }
-
-                throw 2;
-            }
-            */
             
             if (isTerminal(position)) {
                 if (isRunnerStep(position)) {
@@ -230,12 +211,8 @@ int solve() {
                 }
                 
             }
-            int count2 = usedPositions.size();
-            std::cerr << "Pos count: " << count2 << " | Q count: " << q.size() << std::endl;
-            if (count1 == count2) {
-                throw 2;
-                break;
-            }
+            
+            //std::cerr << "Pos count: " << usedPositions.size() << " | Q count: " << q.size() << std::endl;
         }
 
         std::set<Position> &N = winPositions;
@@ -250,8 +227,8 @@ int solve() {
         std::set_difference(U.begin(), U.end(), un.begin(), un.end(), std::inserter(diff, diff.begin()));
         U = diff;
 
-        //print('Start position:', startPosition)
-        //print(f'Start: U: {len(U)} | N: {len(N)} | P: {len(P)}')
+        //std::cerr << "Start position:" << startPosition << std::endl;
+        //std::cerr << "Start: U: " << U.size()<< " | N: " << N.size() << " | P: " << P.size() << std::endl;
         
         while (U.size() > 0) {
             std::set<Position> R;
@@ -310,7 +287,7 @@ int main() {
         for (int j = 0; j < n; j++) {
             if (s[j] == '1') {
                 walls.insert({i, j});
-                // std::cerr << "Wall at " << i << ", " << j << std::endl;
+                //std::cerr << "Wall at " << i << ", " << j << " = " << i*n + j << std::endl;
             } else if (s[j] == '2') {
                 runner = i*n + j;
             } else if (s[j] == '3') {
