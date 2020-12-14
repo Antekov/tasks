@@ -1,30 +1,40 @@
+def mex(s) -> int:
+    if -1 in s:
+        return -1
+    x = 0
+    while x in s:
+        x += 1
+    return x
+
 n = int(input())
 
-V = dict()
+g = [0]*max(8, (n+1))
 
-V[(0,0)] = set()
-V[(0,1)] = set()
-V[(1,1)] = set()
-V[(0,2)] = set([(0,1)])
+g[0] = mex(set())
+g[1] = mex(set())
 
-for k in range(n):
-    for i in range(2, n+1-k):
-        V[(k,i)] = {tuple(sorted([k, i-1])), tuple(sorted([k, i-2]))}
-        for j in range(i-1, i-1):
-            V[(k,i)].add(tuple(sorted([j-1, i-j])))
+w = []
 
-for prev, nexts in V.items():
-    print(prev, ':', *nexts)
+m = 2
+while m <= n:
+    s = set()
+
+    for i in range(1, (m + m % 2) // 2 + 1):
+        xor = g[i - 1] ^ g[m - i]
+        s.add(xor)
+        if m == n and xor == 0:
+            w.append(i)
+            w.append(n-i+1)
+
+    g[m] = mex(s)
+    m += 1
+
+# print(g)
 
 
-N = set()
+if g[n] > 0:
+    print('Schtirlitz')
+else:
+    print('Mueller')
 
-for prev, nexts in V.items():
-    print(prev, ':', *nexts)
-    c = 0
-    for pos in nexts:
-        if len(V[pos]) == 0:
-            N.add(prev)
-            c += 1
-    
-
+print(*sorted(set(w)), sep='\n')
